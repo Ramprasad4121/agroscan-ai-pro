@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { ArrowRight, Sprout, Video, Mic, Globe, Calendar, BookOpen, Camera, ChevronRight, Droplets, TrendingUp, Calculator, Shield, Warehouse, Store, PieChart, Zap, FileText, Users, MessageCircle, Plane, Info, Activity, Leaf, Coins, Briefcase } from 'lucide-react';
+import React from 'react';
+import { Camera, Mic, Video, Droplets, Calendar, Calculator, Shield, Warehouse, Globe, Store, PieChart, Zap, Users, FileText, Plane, Leaf, ArrowRight, TrendingUp, CloudSun } from 'lucide-react';
 import { ViewState } from '../types';
 import { WeatherWidget, MandiTicker } from './DashboardWidgets';
 
@@ -12,213 +12,116 @@ interface HeroProps {
 }
 
 export const Hero: React.FC<HeroProps> = ({ onNavigate, t, userLocation, userName }) => {
-  const currentHour = new Date().getHours();
-  const greeting = currentHour < 12 ? "Good Morning" : currentHour < 17 ? "Good Afternoon" : "Good Evening";
-
-  // Define Categories for cleaner layout
-  const categories = [
-    {
-      title: "Smart Management",
-      subtitle: "Optimize your daily farming operations",
-      items: [
-        { id: 'water', title: t.water_title, desc: t.water_desc, icon: Droplets, path: 'water', color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-900/20' },
-        { id: 'calendar', title: t.calendar_title, desc: t.calendar_desc, icon: Calendar, path: 'calendar', color: 'text-orange-500', bg: 'bg-orange-50 dark:bg-orange-900/20' },
-        { id: 'fertilizer', title: t.fert_title, desc: t.fert_desc, icon: Calculator, path: 'fertilizer', color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-900/20' },
-        { id: 'pesticide', title: t.pest_title, desc: t.pest_desc, icon: Shield, path: 'pesticide', color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-900/20' },
-        { id: 'yield', title: t.yield_title, desc: t.yield_desc, icon: TrendingUp, path: 'yield', color: 'text-indigo-500', bg: 'bg-indigo-50 dark:bg-indigo-900/20' },
-        { id: 'recommend', title: t.rec_title, desc: t.rec_desc, icon: Sprout, path: 'recommend', color: 'text-teal-500', bg: 'bg-teal-50 dark:bg-teal-900/20' },
-      ]
-    },
-    {
-      title: "Market & Finance",
-      subtitle: "Maximize profits and secure funding",
-      items: [
-        { id: 'market', title: t.market_title, desc: t.market_desc, icon: Globe, path: 'market', color: 'text-purple-500', bg: 'bg-purple-50 dark:bg-purple-900/20' },
-        { id: 'profit', title: t.profit_title, desc: t.profit_desc, icon: PieChart, path: 'profit', color: 'text-green-600', bg: 'bg-green-50 dark:bg-green-900/20' },
-        { id: 'marketplace', title: t.market_place_title, desc: t.market_place_desc, icon: Store, path: 'marketplace', color: 'text-amber-600', bg: 'bg-amber-50 dark:bg-amber-900/20' },
-        { id: 'storage', title: t.storage_title, desc: t.storage_desc, icon: Warehouse, path: 'storage', color: 'text-sky-500', bg: 'bg-sky-50 dark:bg-sky-900/20' },
-        { id: 'schemes', title: t.schemes_title, desc: t.schemes_desc, icon: BookOpen, path: 'schemes', color: 'text-yellow-500', bg: 'bg-yellow-50 dark:bg-yellow-900/20' },
-      ]
-    },
-    {
-      title: "Services & Community",
-      subtitle: "Connect and access essential services",
-      items: [
-        { id: 'passport', title: t.passport_title, desc: t.passport_desc, icon: FileText, path: 'passport', color: 'text-indigo-600', bg: 'bg-indigo-50 dark:bg-indigo-900/20' },
-        { id: 'drones', title: t.drone_title, desc: t.drone_desc, icon: Plane, path: 'drones', color: 'text-cyan-500', bg: 'bg-cyan-50 dark:bg-cyan-900/20' },
-        { id: 'electricity', title: t.power_title, desc: t.power_desc, icon: Zap, path: 'electricity', color: 'text-yellow-400', bg: 'bg-yellow-50 dark:bg-yellow-900/20' },
-        { id: 'community', title: t.community_title, desc: t.community_desc, icon: Users, path: 'community', color: 'text-pink-500', bg: 'bg-pink-50 dark:bg-pink-900/20' },
-      ]
-    }
+  const tools = [
+    { id: 'water', title: t.water_title, icon: Droplets, path: 'water' },
+    { id: 'calendar', title: t.calendar_title, icon: Calendar, path: 'calendar' },
+    { id: 'fertilizer', title: t.fert_title, icon: Calculator, path: 'fertilizer' },
+    { id: 'pesticide', title: t.pest_title, icon: Shield, path: 'pesticide' },
+    { id: 'yield', title: t.yield_title, icon: Leaf, path: 'yield' },
+    { id: 'market', title: t.market_title, icon: Globe, path: 'market' },
+    { id: 'profit', title: t.profit_title, icon: PieChart, path: 'profit' },
+    { id: 'electricity', title: t.power_title, icon: Zap, path: 'electricity' },
   ];
 
   return (
-    <div className="relative bg-transparent min-h-screen pb-20 transition-colors duration-300 font-sans">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       
-      {/* Header Section - Transparent to show background field */}
-      <div className="pb-8 pt-6 px-4 md:px-8 sticky top-0 z-30">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
-            <div>
-              <p className="text-xs font-bold text-white uppercase tracking-wider mb-1 drop-shadow-md">
-                {new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })}
-              </p>
-              <h1 className="text-2xl md:text-3xl font-display font-bold text-white drop-shadow-lg">
-                {t.welcome_farmer || greeting}, <span className="text-yellow-300">{userName || 'Farmer'}</span>
-              </h1>
-            </div>
-            
-            <div className="flex gap-3 w-full md:w-auto">
-               <button 
-                 onClick={() => onNavigate('live')}
-                 className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-white/90 hover:bg-white text-[#388E3C] px-5 py-2.5 rounded-xl font-bold transition-colors shadow-lg"
-               >
-                  <Mic size={18} />
-                  <span>{t.live_title}</span>
-               </button>
-               <button 
-                 onClick={() => onNavigate('scan')}
-                 className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-slate-900 text-white hover:bg-slate-800 px-5 py-2.5 rounded-xl font-bold shadow-lg transition-all"
-               >
-                  <Camera size={18} />
-                  <span>{t.quick_scan}</span>
-               </button>
-            </div>
-          </div>
+      {/* Welcome Header */}
+      <div className="mb-8 flex flex-col md:flex-row justify-between items-end border-b border-tech-border pb-6">
+        <div>
+           <h2 className="text-tech-cyan font-bold text-sm uppercase tracking-[0.2em] mb-1">Dashboard</h2>
+           <h1 className="text-3xl md:text-5xl font-display font-bold text-tech-primary">
+             {userName || 'Farmer Unit'}
+           </h1>
+        </div>
+        <div className="text-right mt-4 md:mt-0">
+           <p className="text-tech-secondary text-sm font-mono">{new Date().toDateString()}</p>
+           <p className="text-tech-amber text-sm font-bold uppercase flex items-center justify-end gap-1">
+             <span className="w-2 h-2 bg-tech-amber rounded-full animate-pulse"></span> System Active
+           </p>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 md:px-8 py-2 space-y-10">
+      <div className="grid grid-cols-12 gap-6">
         
-        {/* Priority Widgets Row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-           <div className="h-40 rounded-2xl overflow-hidden shadow-sm border border-white/50 bg-white/90 backdrop-blur-sm dark:bg-slate-900/90">
-              <WeatherWidget userLocation={userLocation || null} t={t} />
-           </div>
-           <div className="h-40 rounded-2xl overflow-hidden shadow-sm border border-white/50 bg-white/90 backdrop-blur-sm dark:bg-slate-900/90">
-              <MandiTicker userLocation={userLocation || null} t={t} />
-           </div>
-        </div>
-
-        {/* Primary Action Banner */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div 
-              onClick={() => onNavigate('scan')}
-              className="md:col-span-2 relative overflow-hidden bg-gradient-to-br from-[#388E3C] to-emerald-800 rounded-3xl p-8 text-white shadow-xl group cursor-pointer hover:scale-[1.01] transition-transform border border-white/20"
-            >
-                <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <Leaf size={180} />
-                </div>
-                <div className="relative z-10 flex flex-col h-full justify-between">
-                   <div>
-                      <span className="inline-block px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-bold mb-3 border border-white/10">AI Diagnosis</span>
-                      <h2 className="text-3xl font-bold mb-2">{t.diagnose_now || "Check Crop Health"}</h2>
-                      <p className="text-green-50 max-w-md text-sm md:text-base leading-relaxed">
-                        {t.analyzing_desc || "Take a photo of your plant. Our AI will detect diseases, pests, and nutrient deficiencies instantly."}
-                      </p>
-                   </div>
-                   <div className="mt-6 flex items-center gap-3">
-                      <span className="bg-white text-[#388E3C] px-5 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 shadow-sm">
-                         <Camera size={18} /> Start Scan
-                      </span>
-                   </div>
-                </div>
-            </div>
-
-            <div 
-               onClick={() => onNavigate('video')}
-               className="bg-white/95 backdrop-blur-sm dark:bg-slate-900/90 rounded-3xl p-8 border border-white/50 dark:border-slate-800 shadow-sm group cursor-pointer hover:border-blue-400 transition-colors relative overflow-hidden"
-            >
-               <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-blue-50 dark:bg-blue-900/20 rounded-full blur-2xl group-hover:scale-150 transition-transform"></div>
-               <div className="relative z-10 h-full flex flex-col justify-between">
-                  <div>
-                     <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-2xl flex items-center justify-center text-blue-600 mb-4 group-hover:scale-110 transition-transform">
-                        <Video size={24} />
-                     </div>
-                     <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1">{t.video_title}</h3>
-                     <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed">{t.video_desc}</p>
-                  </div>
-                  <div className="mt-4 flex justify-end">
-                     <div className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-900 dark:text-white group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                        <ArrowRight size={18} />
-                     </div>
-                  </div>
-               </div>
-            </div>
-        </div>
-
-        {/* Categorized Features */}
-        <div className="bg-white/80 dark:bg-slate-950/80 backdrop-blur-md rounded-[2.5rem] p-6 md:p-8 border border-white/20 shadow-xl">
-           {categories.map((cat, idx) => (
-              <div key={idx} className="space-y-4 animate-slide-up mb-10 last:mb-0" style={{animationDelay: `${idx * 100}ms`}}>
-                 <div className="flex items-end justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
-                    <div>
-                       <h3 className="text-lg font-bold text-slate-900 dark:text-white">{cat.title}</h3>
-                       <p className="text-slate-500 text-xs hidden sm:block">{cat.subtitle}</p>
-                    </div>
+        {/* Main Action: AI Scanner */}
+        <div onClick={() => onNavigate('scan')} className="col-span-12 lg:col-span-6 tech-card p-8 relative overflow-hidden group cursor-pointer">
+           <div className="absolute inset-0 bg-gradient-to-r from-tech-cyan/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+           <div className="relative z-10 flex justify-between items-start h-full">
+              <div className="flex flex-col justify-between h-full min-h-[180px]">
+                 <div>
+                    <span className="bg-tech-cyan/20 text-tech-cyan text-[10px] font-bold px-2 py-1 rounded border border-tech-cyan/30 uppercase">AI Diagnosis</span>
+                    <h3 className="text-3xl font-display font-bold text-tech-primary mt-3 leading-tight">SCAN CROP<br/>HEALTH</h3>
                  </div>
-                 
-                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {cat.items.map((item: any) => (
-                       <FeatureCard 
-                          key={item.id}
-                          item={item}
-                          onClick={() => onNavigate(item.path)}
-                       />
-                    ))}
+                 <div className="flex items-center gap-3 text-tech-cyan font-bold uppercase text-sm tracking-wider">
+                    Initiate <ArrowRight size={18} />
                  </div>
               </div>
-           ))}
+              <div className="w-24 h-24 rounded-full bg-tech-bg border border-tech-cyan/30 flex items-center justify-center shadow-[0_0_20px_rgba(77,208,225,0.1)] group-hover:scale-110 transition-transform">
+                 <Camera size={40} className="text-tech-cyan" />
+              </div>
+           </div>
         </div>
+
+        {/* Live Assistant */}
+        <div onClick={() => onNavigate('live')} className="col-span-12 md:col-span-6 lg:col-span-3 tech-card p-6 cursor-pointer hover:border-tech-amber/50 group">
+           <div className="flex justify-between items-start mb-6">
+              <div className="p-3 bg-tech-bg rounded-lg border border-tech-border group-hover:border-tech-amber/50">
+                 <Mic size={24} className="text-tech-amber" />
+              </div>
+              <span className="text-[10px] font-bold text-tech-secondary uppercase tracking-widest">Voice</span>
+           </div>
+           <h3 className="text-xl font-bold text-tech-primary mb-1">Assistant</h3>
+           <p className="text-xs text-tech-secondary">Talk to AI Expert</p>
+        </div>
+
+        {/* Schemes */}
+        <div onClick={() => onNavigate('schemes')} className="col-span-12 md:col-span-6 lg:col-span-3 tech-card p-6 cursor-pointer hover:border-white/30 group">
+           <div className="flex justify-between items-start mb-6">
+              <div className="p-3 bg-tech-bg rounded-lg border border-tech-border group-hover:border-white/30">
+                 <FileText size={24} className="text-white" />
+              </div>
+              <span className="text-[10px] font-bold text-tech-secondary uppercase tracking-widest">Finance</span>
+           </div>
+           <h3 className="text-xl font-bold text-tech-primary mb-1">Schemes</h3>
+           <p className="text-xs text-tech-secondary">Loans & Subsidy</p>
+        </div>
+
+        {/* Weather Widget Area */}
+        <div className="col-span-12 md:col-span-8 h-40">
+           <WeatherWidget userLocation={userLocation || null} t={t} />
+        </div>
+
+        {/* Mandi Ticker */}
+        <div className="col-span-12 md:col-span-4 h-40">
+           <MandiTicker userLocation={userLocation || null} t={t} />
+        </div>
+
+      </div>
+
+      {/* Tools Grid */}
+      <div className="mt-10">
+         <h3 className="text-tech-secondary text-xs font-bold uppercase tracking-[0.2em] mb-6 flex items-center gap-4">
+            <span className="h-px flex-1 bg-tech-border"></span>
+            Operational Tools
+            <span className="h-px flex-1 bg-tech-border"></span>
+         </h3>
+         
+         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {tools.map((tool) => (
+               <div 
+                  key={tool.id}
+                  onClick={() => onNavigate(tool.path as ViewState)}
+                  className="tech-card p-4 flex flex-col items-center justify-center text-center gap-3 hover:bg-tech-cardHover cursor-pointer group min-h-[140px]"
+               >
+                  <div className="text-tech-secondary group-hover:text-tech-cyan transition-colors">
+                     <tool.icon size={28} strokeWidth={1.5} />
+                  </div>
+                  <span className="text-xs font-bold text-tech-primary uppercase tracking-wide group-hover:text-white">{tool.title}</span>
+               </div>
+            ))}
+         </div>
       </div>
     </div>
   );
 };
-
-interface FeatureCardProps {
-  item: any;
-  onClick: () => void;
-}
-
-const FeatureCard: React.FC<FeatureCardProps> = ({ item, onClick }) => {
-   const [showInfo, setShowInfo] = useState(false);
-
-   return (
-      <div 
-         onClick={onClick}
-         className="relative bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-[#388E3C] dark:hover:border-green-500 shadow-sm hover:shadow-md transition-all group cursor-pointer overflow-hidden h-full flex flex-col"
-      >
-         <div className="flex justify-between items-start mb-4 relative z-10">
-            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${item.bg} ${item.color} transition-transform group-hover:scale-110`}>
-               <item.icon size={24} />
-            </div>
-            <button 
-               className="text-slate-300 hover:text-slate-500 dark:hover:text-slate-400 transition-colors p-1"
-               onClick={(e) => {
-                  e.stopPropagation();
-                  setShowInfo(!showInfo);
-               }}
-               onMouseEnter={() => setShowInfo(true)}
-               onMouseLeave={() => setShowInfo(false)}
-            >
-               <Info size={16} />
-            </button>
-         </div>
-         
-         <h4 className="text-base font-bold text-slate-900 dark:text-white mb-1 group-hover:text-[#388E3C] dark:group-hover:text-green-400 transition-colors relative z-10">
-            {item.title}
-         </h4>
-         <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 relative z-10">
-            {item.desc}
-         </p>
-
-         {/* Reveal Description Overlay */}
-         <div className={`absolute inset-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm p-5 flex flex-col justify-center items-center text-center transition-opacity duration-200 ${showInfo ? 'opacity-100 visible' : 'opacity-0 invisible'} z-20`}>
-            <p className="text-xs font-medium text-slate-600 dark:text-slate-300 leading-relaxed">
-               {item.desc}
-            </p>
-            <span className="mt-3 text-[10px] font-bold text-[#388E3C] uppercase tracking-wider">Click to Open</span>
-         </div>
-      </div>
-   );
-}

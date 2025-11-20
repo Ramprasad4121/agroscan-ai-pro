@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Sprout, Home, LogOut, User as UserIcon, Moon, Sun, Globe, Bell, Wifi, WifiOff, CheckCircle2, RefreshCw, ChevronDown, Languages, ArrowLeft } from 'lucide-react';
+import { Sprout, LogOut, User as UserIcon, Moon, Sun, Globe, Bell, Wifi, WifiOff, CheckCircle2, RefreshCw, ChevronDown, Languages, ArrowLeft, Menu } from 'lucide-react';
 import { User, ViewState, Notification } from '../types';
 import { LANGUAGES } from '../translations';
 import { offlineService } from '../services/offline';
@@ -15,56 +15,34 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ user, onNavigate, onLogout, currentView, language, setLanguage }) => {
-  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
-    if (typeof window !== 'undefined') {
-      const savedTheme = localStorage.getItem('theme') as 'light' | 'dark';
-      if (savedTheme) return savedTheme;
-      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    }
-    return 'light';
-  });
-
+  // Theme toggle mostly for dev/consumer mode, forced dark for Pro
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [syncCount, setSyncCount] = useState(0);
   const [isSyncing, setIsSyncing] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   
   const [notifications, setNotifications] = useState<Notification[]>([
-    { id: '1', title: 'Weather Alert', message: 'Heavy rain expected in Nashik district tomorrow.', type: 'alert', timestamp: new Date(), read: false },
-    { id: '2', title: 'Market Update', message: 'Onion prices up by 15% in Lasalgaon Mandi.', type: 'info', timestamp: new Date(Date.now() - 3600000), read: false },
-    { id: '3', title: 'Loan Approved', message: 'Your KCC loan application #L-101 has been verified.', type: 'success', timestamp: new Date(Date.now() - 86400000), read: true },
+    { id: '1', title: 'Weather Alert', message: 'Heavy rain expected in Nashik district.', type: 'alert', timestamp: new Date(), read: false },
+    { id: '2', title: 'Market Update', message: 'Onion prices up by 15%.', type: 'info', timestamp: new Date(Date.now() - 3600000), read: false },
   ]);
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
   useEffect(() => {
-    const handleOnline = () => {
-      setIsOnline(true);
-      handleSync();
-    };
+    const handleOnline = () => { setIsOnline(true); handleSync(); };
     const handleOffline = () => setIsOnline(false);
-    
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
-    
     const updateQueue = () => setSyncCount(offlineService.getQueueCount());
     window.addEventListener('sync-queue-updated', updateQueue);
     updateQueue();
-
-    const root = window.document.documentElement;
-    if (theme === 'dark') {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
-    localStorage.setItem('theme', theme);
-
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
       window.removeEventListener('sync-queue-updated', updateQueue);
     };
-  }, [theme]);
+  }, []);
 
   const handleSync = async () => {
     if (offlineService.getQueueCount() > 0) {
@@ -75,191 +53,121 @@ export const Header: React.FC<HeaderProps> = ({ user, onNavigate, onLogout, curr
     }
   };
 
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
-  };
-
-  const handleNotificationClick = () => {
-    setShowNotifications(!showNotifications);
-    if (!showNotifications && unreadCount > 0) {
-      setTimeout(() => {
-        setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-      }, 2000);
-    }
-  };
-
   return (
-    <header className="sticky top-0 z-40 w-full bg-[#388E3C] shadow-md transition-colors duration-300">
-      <div className="max-w-7xl mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8 text-white">
+    <header className="sticky top-0 z-40 w-full bg-tech-bg/95 backdrop-blur-md border-b border-tech-border h-16 md:h-20 flex items-center">
+      <div className="max-w-7xl mx-auto w-full flex items-center justify-between px-4 sm:px-6 lg:px-8">
         
-        <div className="flex items-center gap-1 md:gap-3">
-           {currentView !== 'home' && (
+        {/* Left: Logo & Back */}
+        <div className="flex items-center gap-3">
+           {currentView !== 'home' && user && (
               <button 
                 onClick={() => onNavigate('home')}
-                className="p-2 -ml-2 mr-1 rounded-full hover:bg-white/10 text-white transition-colors"
-                aria-label="Go Back"
+                className="p-2 -ml-2 rounded-full hover:bg-tech-card text-tech-secondary hover:text-tech-cyan transition-colors"
               >
-                <ArrowLeft size={24} />
+                <ArrowLeft size={20} />
               </button>
            )}
            
-           <div className="flex items-center gap-2 md:gap-3 cursor-pointer group" onClick={() => onNavigate('home')}>
-             <div className="flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-xl bg-white text-[#388E3C] shadow-lg group-hover:scale-105 transition-transform">
-               <Sprout size={20} className="md:w-[22px] md:h-[22px]" />
+           <div className="flex items-center gap-3 cursor-pointer group" onClick={() => user && onNavigate('home')}>
+             <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-tech-card border border-tech-border text-tech-cyan group-hover:border-tech-cyan transition-colors shadow-lg">
+               <Sprout size={20} strokeWidth={2} />
              </div>
-             <span className="font-display font-bold text-lg md:text-xl tracking-tight text-white">
-               AgroScan<span className="text-green-200">AI</span>
-               <span className="hidden sm:inline-block ml-2 px-2 py-0.5 bg-white/20 text-white text-[10px] font-bold uppercase tracking-widest rounded-full align-middle border border-white/30">Pro</span>
-             </span>
+             <div className="hidden md:block">
+                <span className="font-display font-bold text-xl tracking-tight text-tech-primary">
+                  AGROSCAN <span className="text-tech-cyan">AI</span>
+                </span>
+                <span className="block text-[10px] text-tech-secondary uppercase tracking-[0.2em] leading-none">Professional</span>
+             </div>
            </div>
         </div>
 
-        <div className="flex items-center gap-1 md:gap-4">
-           {/* Sync / Network Status */}
+        {/* Right: Controls */}
+        <div className="flex items-center gap-3 md:gap-5">
+           
+           {/* Network Status */}
            <div 
-              className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/20 transition-all cursor-pointer ${
+              className={`hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all cursor-pointer text-xs font-bold tracking-wide ${
                 !isOnline 
-                  ? 'bg-red-500/20 text-white border-red-400' 
+                  ? 'bg-red-900/20 border-red-800 text-red-500' 
                   : syncCount > 0 
-                    ? 'bg-amber-500/20 text-white border-amber-400'
-                    : 'bg-white/10 text-white/80'
+                    ? 'bg-tech-amber/10 border-tech-amber text-tech-amber'
+                    : 'bg-tech-card border-tech-border text-tech-secondary'
               }`}
               onClick={handleSync}
            >
-              {!isOnline ? (
-                <>
-                  <WifiOff size={14} /> <span className="text-xs font-bold">Offline</span>
-                </>
-              ) : isSyncing ? (
-                <>
-                   <RefreshCw size={14} className="animate-spin" /> <span className="text-xs font-bold">Syncing...</span>
-                </>
-              ) : syncCount > 0 ? (
-                <>
-                   <RefreshCw size={14} /> <span className="text-xs font-bold">{syncCount} Pending</span>
-                </>
-              ) : (
-                <>
-                   <Wifi size={14} className="text-green-300" /> <span className="text-xs font-bold text-white/80">Synced</span>
-                </>
-              )}
+              {!isOnline ? <WifiOff size={14} /> : isSyncing ? <RefreshCw size={14} className="animate-spin" /> : <Wifi size={14} className="text-tech-cyan" />}
+              <span>{isOnline ? (isSyncing ? 'SYNCING' : syncCount > 0 ? `${syncCount} PENDING` : 'ONLINE') : 'OFFLINE'}</span>
            </div>
 
-          {/* Enhanced Language Selector */}
+          {/* Language */}
           <div className="relative group">
-            <button className="flex items-center gap-1.5 px-2 py-2 md:px-3 text-sm text-white hover:bg-white/10 rounded-xl transition-colors border border-transparent hover:border-white/20">
-              <Globe size={18} className="text-white" />
-              <span className="uppercase font-bold hidden md:inline-block text-xs tracking-wide">{language}</span>
-              <ChevronDown size={14} className="text-white/70 group-hover:text-white transition-colors" />
+            <button className="flex items-center gap-2 px-3 py-2 text-xs font-bold text-tech-primary hover:text-tech-cyan transition-colors uppercase tracking-wider">
+              <Globe size={16} />
+              <span className="hidden md:inline">{language}</span>
             </button>
             
-            <div className="absolute right-0 top-full mt-2 w-72 sm:w-96 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform translate-y-2 group-hover:translate-y-0 overflow-hidden z-50 origin-top-right">
-              <div className="p-4 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
-                 <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
-                    <Languages size={14} /> Select Language / भाषा चुनें
-                 </h4>
-              </div>
-              <div className="p-2 max-h-[400px] overflow-y-auto grid grid-cols-2 gap-1">
-                {LANGUAGES.map((lang) => (
+            {/* Dropdown */}
+            <div className="absolute right-0 top-full mt-2 w-64 bg-tech-card border border-tech-border rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 max-h-96 overflow-y-auto">
+               <div className="p-3 border-b border-tech-border text-xs font-bold text-tech-secondary uppercase">Select Language</div>
+               {LANGUAGES.map((lang) => (
                   <button
                     key={lang.code}
                     onClick={() => setLanguage(lang.code)}
-                    className={`text-left px-3 py-2.5 rounded-xl flex items-center justify-between transition-all group/item ${
-                      language === lang.code 
-                        ? 'bg-green-50 dark:bg-green-900/20 text-[#388E3C] dark:text-green-400 border border-green-200 dark:border-green-800/50' 
-                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 border border-transparent'
-                    }`}
+                    className={`w-full text-left px-4 py-3 text-sm hover:bg-tech-bg flex items-center justify-between ${language === lang.code ? 'text-tech-cyan' : 'text-tech-secondary'}`}
                   >
-                    <div className="flex flex-col">
-                       <span className={`text-sm ${language === lang.code ? 'font-bold' : 'font-medium group-hover/item:text-slate-900 dark:group-hover/item:text-white'}`}>
-                         {lang.localName}
-                       </span>
-                       <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">{lang.name}</span>
-                    </div>
-                    {language === lang.code && <CheckCircle2 size={16} className="text-[#388E3C]" />}
+                    <span>{lang.localName}</span>
+                    {language === lang.code && <CheckCircle2 size={14} />}
                   </button>
-                ))}
-              </div>
+               ))}
             </div>
           </div>
 
           {/* Notification Bell */}
           {user && (
-            <div className="relative">
-              <button 
-                onClick={handleNotificationClick}
-                className="p-2 text-white hover:bg-white/10 rounded-full transition-colors relative"
-              >
-                <Bell size={20} />
-                {unreadCount > 0 && (
-                  <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 border-2 border-[#388E3C] rounded-full animate-pulse"></span>
-                )}
-              </button>
-              
-              {showNotifications && (
-                <div className="absolute right-0 top-full mt-2 w-80 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl overflow-hidden z-50 animate-slide-up origin-top-right">
-                   <div className="p-3 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white">
-                      <h4 className="text-sm font-bold">Notifications</h4>
-                      <span className="text-xs text-slate-500">Updated just now</span>
-                   </div>
-                   <div className="max-h-80 overflow-y-auto">
-                      {notifications.length === 0 ? (
-                        <div className="p-8 text-center text-slate-400 text-sm">No new notifications</div>
-                      ) : (
-                        notifications.map(n => (
-                          <div key={n.id} className={`p-4 border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${!n.read ? 'bg-blue-50/30 dark:bg-blue-900/10' : ''}`}>
-                             <div className="flex gap-3">
-                                <div className={`mt-1 w-2 h-2 rounded-full shrink-0 ${n.type === 'alert' ? 'bg-red-500' : n.type === 'success' ? 'bg-green-500' : 'bg-blue-500'}`}></div>
-                                <div>
-                                   <h5 className={`text-sm font-bold mb-0.5 ${!n.read ? 'text-slate-900 dark:text-white' : 'text-slate-600 dark:text-slate-400'}`}>{n.title}</h5>
-                                   <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{n.message}</p>
-                                   <span className="text-[10px] text-slate-400 mt-2 block">{n.timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-                                </div>
-                             </div>
-                          </div>
-                        ))
-                      )}
-                   </div>
-                </div>
+            <button 
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="relative p-2 text-tech-secondary hover:text-tech-cyan transition-colors"
+            >
+              <Bell size={20} />
+              {unreadCount > 0 && (
+                <span className="absolute top-1 right-1 w-2 h-2 bg-tech-amber rounded-full animate-pulse shadow-[0_0_8px_#FFC107]"></span>
               )}
-            </div>
+            </button>
           )}
 
-          <button
-            onClick={toggleTheme}
-            className="p-2 text-white hover:bg-white/10 rounded-full transition-colors"
-          >
-            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-          </button>
-
+          {/* User Profile */}
           {user && (
-            <nav className="flex items-center gap-1 md:gap-4">
-              <div className="h-6 w-px bg-white/20 hidden md:block"></div>
-
-              <div className="flex items-center gap-2 pl-2 cursor-pointer" title="Verified Identity">
-                <div className="relative">
-                  <div className="w-8 h-8 rounded-full bg-white/10 border border-white/30 flex items-center justify-center text-white">
-                    <UserIcon size={16} />
-                  </div>
-                  {user.kycStatus === 'Verified' && (
-                    <div className="absolute -bottom-1 -right-1 bg-white border-2 border-[#388E3C] rounded-full p-[2px]">
-                      <CheckCircle2 size={8} className="text-[#388E3C]" />
-                    </div>
-                  )}
-                </div>
-                <span className="text-sm font-medium text-white hidden sm:block max-w-[100px] truncate">{user.name}</span>
-                <button 
+            <div className="flex items-center gap-3 pl-4 border-l border-tech-border">
+               <div className="text-right hidden md:block">
+                  <span className="block text-sm font-bold text-tech-primary leading-none">{user.name}</span>
+                  <span className="text-[10px] text-tech-cyan uppercase tracking-wider">{user.role}</span>
+               </div>
+               <button 
                   onClick={onLogout}
-                  className="ml-1 md:ml-2 p-2 text-white/70 hover:text-red-200 transition-colors"
-                  title="Sign Out"
-                >
-                  <LogOut size={18} />
-                </button>
-              </div>
-            </nav>
+                  className="p-2 text-tech-secondary hover:text-red-400 transition-colors"
+                  title="Logout"
+               >
+                  <LogOut size={20} />
+               </button>
+            </div>
           )}
         </div>
       </div>
+
+      {/* Mobile Notification Dropdown */}
+      {showNotifications && (
+         <div className="absolute top-16 right-4 w-80 bg-tech-card border border-tech-border rounded-lg shadow-2xl z-50 animate-slide-up">
+            <div className="p-3 border-b border-tech-border font-bold text-xs uppercase text-tech-secondary tracking-wider">Alerts</div>
+            <div className="max-h-64 overflow-y-auto">
+               {notifications.map(n => (
+                  <div key={n.id} className="p-4 border-b border-tech-border hover:bg-tech-bg/50 transition-colors">
+                     <h5 className={`text-sm font-bold mb-1 ${n.type === 'alert' ? 'text-red-400' : 'text-tech-primary'}`}>{n.title}</h5>
+                     <p className="text-xs text-tech-secondary">{n.message}</p>
+                  </div>
+               ))}
+            </div>
+         </div>
+      )}
     </header>
   );
 };

@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, ArrowRight, Check } from 'lucide-react';
 
 interface Step {
@@ -80,6 +80,12 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ t, onComplete })
     }
   };
 
+  const handleBack = () => {
+    if (currentStep > 0) {
+      setCurrentStep(prev => prev - 1);
+    }
+  };
+
   const current = steps[currentStep];
   const isLast = currentStep === steps.length - 1;
 
@@ -89,7 +95,7 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ t, onComplete })
 
     return (
       <>
-        {/* Overlay with hole - utilizing CSS clip-path or large border box-shadow trick */}
+        {/* Overlay with hole - utilizing CSS clip-path */}
         <div 
           className="fixed inset-0 z-40 transition-all duration-500 ease-in-out"
           style={{
@@ -108,7 +114,7 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ t, onComplete })
         />
         {/* Glowing border around target */}
         <div 
-          className="fixed z-50 pointer-events-none border-2 border-white rounded-xl shadow-[0_0_20px_rgba(255,255,255,0.5)] transition-all duration-500 ease-in-out"
+          className="fixed z-50 pointer-events-none border-2 border-white rounded-xl shadow-[0_0_30px_rgba(255,255,255,0.6)] animate-pulse transition-all duration-500 ease-in-out"
           style={{
             top: targetRect.top - 4,
             left: targetRect.left - 4,
@@ -133,12 +139,10 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ t, onComplete })
       };
     } else {
       // Calculate position relative to target
-      // Default to bottom, flip to top if no space
       const spaceBelow = window.innerHeight - targetRect.bottom;
-      const spaceRight = window.innerWidth - targetRect.right;
       
       if (window.innerWidth < 640) {
-        // Mobile: Fixed bottom sheet style or just centered near bottom
+        // Mobile: Fixed bottom sheet style
         style = {
           bottom: '20px',
           left: '50%',
@@ -150,7 +154,7 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ t, onComplete })
         const top = targetRect.bottom + 20;
         const left = targetRect.left + (targetRect.width / 2) - 160; // Center align 320px card
         style = {
-          top: top > window.innerHeight - 250 ? targetRect.top - 200 : top, // Flip if too low
+          top: top > window.innerHeight - 250 ? targetRect.top - 220 : top, // Flip if too low
           left: Math.max(20, Math.min(window.innerWidth - 340, left)), // Clamp to screen
         };
       }
@@ -161,34 +165,46 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ t, onComplete })
         className="fixed z-50 bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-2xl border border-slate-100 dark:border-slate-800 max-w-sm w-full animate-fade-in-up transition-all duration-500"
         style={style}
       >
-        <div className="flex justify-between items-start mb-4">
-          <div className="flex items-center gap-2">
-            <span className="flex items-center justify-center w-6 h-6 rounded-full bg-agro-100 dark:bg-agro-900 text-agro-600 text-xs font-bold">
-              {currentStep + 1}/{steps.length}
-            </span>
-          </div>
-          <button onClick={onComplete} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
-            <X size={18} />
+        <div className="flex justify-between items-start mb-2">
+           <div>
+             <span className="inline-block px-2 py-0.5 rounded bg-agro-100 dark:bg-agro-900/30 text-agro-700 dark:text-agro-400 text-[10px] font-bold uppercase tracking-wider mb-2 border border-agro-200 dark:border-agro-800">
+                Step {currentStep + 1} of {steps.length}
+             </span>
+           </div>
+           <button 
+            onClick={onComplete} 
+            className="p-1 -mr-2 -mt-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            title={t.tour_skip}
+           >
+            <X size={20} />
           </button>
         </div>
 
         <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
           {t[current.titleKey]}
         </h3>
-        <p className="text-slate-600 dark:text-slate-300 mb-6 leading-relaxed">
+        <p className="text-slate-600 dark:text-slate-300 mb-2 leading-relaxed text-sm">
           {t[current.descKey]}
         </p>
 
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
           <button 
-            onClick={onComplete}
-            className="text-sm font-medium text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white px-2"
+            onClick={handleBack}
+            disabled={currentStep === 0}
+            className={`text-sm font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 px-3 py-2 transition-colors ${currentStep === 0 ? 'opacity-0 cursor-default' : ''}`}
           >
-            {t.tour_skip || 'Skip'}
+            Back
           </button>
+          
+          <div className="flex gap-1.5">
+             {steps.map((_, i) => (
+                <div key={i} className={`w-2 h-2 rounded-full transition-all duration-300 ${i === currentStep ? 'bg-agro-600 scale-125' : 'bg-slate-200 dark:bg-slate-700'}`} />
+             ))}
+          </div>
+
           <button 
             onClick={handleNext}
-            className="px-5 py-2.5 bg-agro-600 hover:bg-agro-700 text-white rounded-xl font-bold shadow-lg shadow-agro-200 dark:shadow-none transition-all flex items-center gap-2"
+            className="px-5 py-2.5 bg-agro-600 hover:bg-agro-700 text-white rounded-xl font-bold shadow-lg shadow-agro-200/50 dark:shadow-none transition-all flex items-center gap-2 text-sm"
           >
             {isLast ? (t.tour_finish || 'Finish') : (t.tour_next || 'Next')}
             {isLast ? <Check size={16} /> : <ArrowRight size={16} />}

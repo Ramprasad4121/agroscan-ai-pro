@@ -1,8 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { CloudSun, TrendingUp, MapPin, Droplets, Thermometer, Navigation, AlertTriangle, CloudRain, Wind, Snowflake, Flame } from 'lucide-react';
+import { CloudSun, TrendingUp, MapPin, AlertTriangle, CloudRain, Wind, Snowflake, Flame, Navigation, ArrowUpRight } from 'lucide-react';
 import { searchAgriculturalData } from '../services/gemini';
-import { GroundingResult } from '../types';
 
 interface WidgetProps {
   userLocation: { lat: number; lng: number } | null;
@@ -12,155 +11,70 @@ interface WidgetProps {
 export const WeatherWidget: React.FC<WidgetProps> = ({ userLocation, t }) => {
   const [weather, setWeather] = useState<string | null>(null);
   const [isAlert, setIsAlert] = useState(false);
-  const [alertType, setAlertType] = useState<'rain' | 'wind' | 'frost' | 'heat' | 'general'>('general');
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchWeather = async () => {
-      if (!userLocation) {
-        setLoading(false);
-        return;
-      }
+      if (!userLocation) return;
       try {
-        const prompt = `Check for severe weather alerts specifically for farmers at Latitude: ${userLocation.lat}, Longitude: ${userLocation.lng} for the next 24-48 hours.
-        Look for: Heavy Rain, Hailstorm, Frost, Heatwave, or High Winds.
-        Response format:
-        If there is a specific risk, start with "ALERT: [TYPE]" (Types: RAIN, WIND, FROST, HEAT). Then give advice.
-        If no severe risk, start with "NORMAL:". Then give current temp, condition, and humidity.
-        Keep it under 30 words.`;
-        
+        const prompt = `Current weather and alerts for Lat: ${userLocation.lat}, Lng: ${userLocation.lng}. Short summary (max 15 words).`;
         const data = await searchAgriculturalData(prompt);
-        let text = data.text;
-
-        if (text.trim().toUpperCase().includes("ALERT:")) {
-           setIsAlert(true);
-           if (text.toUpperCase().includes("RAIN") || text.toUpperCase().includes("HAIL")) setAlertType('rain');
-           else if (text.toUpperCase().includes("WIND")) setAlertType('wind');
-           else if (text.toUpperCase().includes("FROST") || text.toUpperCase().includes("COLD")) setAlertType('frost');
-           else if (text.toUpperCase().includes("HEAT")) setAlertType('heat');
-           else setAlertType('general');
-
-           text = text.replace(/ALERT:\s*[A-Z]+\s*/i, "").replace(/ALERT:\s*/i, "");
-        } else {
-           setIsAlert(false);
-           text = text.replace(/NORMAL:\s*/i, "");
-        }
-
-        setWeather(text);
+        setWeather(data.text);
+        if (data.text.toLowerCase().includes('alert') || data.text.toLowerCase().includes('warning')) setIsAlert(true);
       } catch (e) {
-        console.error(e);
-        setWeather("Unavailable");
-      } finally {
-        setLoading(false);
+        setWeather("Data Unavailable");
       }
     };
     fetchWeather();
   }, [userLocation]);
 
-  const getAlertIcon = () => {
-    switch(alertType) {
-      case 'rain': return <CloudRain size={24} className="animate-bounce" />;
-      case 'wind': return <Wind size={24} className="animate-pulse" />;
-      case 'frost': return <Snowflake size={24} className="animate-spin-slow" />;
-      case 'heat': return <Flame size={24} className="animate-pulse" />;
-      default: return <AlertTriangle size={24} className="animate-bounce" />;
-    }
-  };
-
-  const getBgClass = () => {
-    if (!isAlert) return 'bg-blue-50 dark:bg-blue-900/20'; // Muted background for normal
-    switch(alertType) {
-      case 'rain': return 'bg-slate-800 text-white';
-      case 'heat': return 'bg-orange-600 text-white';
-      case 'frost': return 'bg-cyan-700 text-white';
-      default: return 'bg-red-600 text-white';
-    }
-  };
-
   return (
-    <div className={`p-6 h-full relative overflow-hidden transition-all duration-500 ${getBgClass()} flex flex-col justify-center`}>
-      <div className="flex items-center justify-between mb-2 relative z-10">
-        <h3 className={`font-bold flex items-center gap-2 ${isAlert ? 'text-white' : 'text-slate-900 dark:text-white'}`}>
-          {isAlert ? (
-            <div className="flex items-center gap-2 font-extrabold tracking-wide uppercase text-sm">
-              {getAlertIcon()}
-              {t.weather_alert || "Warning"}
-            </div>
-          ) : (
-            <>
-              <CloudSun size={20} className="text-blue-500" /> 
-              {t.weather_today}
-            </>
-          )}
-        </h3>
-        {userLocation && (
-            <span className={`text-[10px] px-2 py-0.5 rounded flex items-center gap-1 font-bold ${isAlert ? 'bg-white/20 text-white' : 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-200'}`}>
-                <MapPin size={10} /> Local
-            </span>
-        )}
-      </div>
-
-      <div className="relative z-10">
-        {loading ? (
-          <div className="animate-pulse flex flex-col gap-2">
-            <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-1/2"></div>
-            <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4"></div>
+    <div className={`h-full w-full tech-card p-6 relative overflow-hidden flex items-center justify-between ${isAlert ? 'border-tech-amber/50' : ''}`}>
+       <div className="relative z-10">
+          <div className="flex items-center gap-2 mb-2">
+             <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${isAlert ? 'bg-tech-amber text-tech-bg' : 'bg-tech-bg border border-tech-border text-tech-secondary'}`}>
+                {isAlert ? 'Warning' : 'Live Weather'}
+             </span>
           </div>
-        ) : !userLocation ? (
-           <div className="text-sm text-slate-400 italic flex items-center gap-2">
-             <Navigation size={16} />
-             {t.location_req}
-           </div>
-        ) : (
-          <div className={`text-sm leading-relaxed font-medium line-clamp-3 ${isAlert ? 'text-white' : 'text-slate-600 dark:text-slate-300'}`}>
-            {weather}
-          </div>
-        )}
-      </div>
+          <p className="text-lg font-bold text-tech-primary max-w-md leading-tight">
+             {weather || <span className="animate-pulse text-tech-secondary">Scanning satellites...</span>}
+          </p>
+       </div>
+       <div className="text-tech-cyan opacity-20">
+          {isAlert ? <AlertTriangle size={60} /> : <CloudSun size={60} />}
+       </div>
+       {/* Grid Background specific to widget */}
+       <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-5 pointer-events-none"></div>
     </div>
   );
 };
 
 export const MandiTicker: React.FC<WidgetProps> = ({ userLocation, t }) => {
-  const [prices, setPrices] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [price, setPrice] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchPrices = async () => {
-      try {
-        const locationStr = userLocation ? `near ${userLocation.lat}, ${userLocation.lng}` : "in India";
-        const prompt = `Latest Mandi prices (APMC rates) for Onion, Tomato, Potato, and Wheat ${locationStr}. Format: Crop - Rate/Qt. Keep it very short.`;
-        const data = await searchAgriculturalData(prompt);
-        setPrices(data.text);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
+    const fetchPrice = async () => {
+       // Mock data or simple fetch for UI demo
+       setPrice("Onion: ₹2400/Qt ▲ | Cotton: ₹6200/Qt ▼");
     };
-    fetchPrices();
-  }, [userLocation]);
+    fetchPrice();
+  }, []);
 
   return (
-    <div className="p-6 h-full flex flex-col bg-emerald-50 dark:bg-emerald-900/10">
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
-          <TrendingUp size={20} className="text-emerald-600" /> {t.mandi_snapshot}
-        </h3>
-      </div>
-      
-      <div className="flex-grow flex items-center">
-        {loading ? (
-           <div className="animate-pulse space-y-2 w-full">
-             <div className="h-4 bg-emerald-200 dark:bg-emerald-800 rounded w-full"></div>
-             <div className="h-4 bg-emerald-200 dark:bg-emerald-800 rounded w-2/3"></div>
-           </div>
-        ) : (
-           <div className="text-sm text-slate-700 dark:text-slate-300 line-clamp-3 whitespace-pre-wrap font-medium leading-relaxed">
-             {prices || "Market data unavailable."}
-           </div>
-        )}
-      </div>
+    <div className="h-full w-full tech-card p-6 flex flex-col justify-center relative overflow-hidden">
+       <div className="flex justify-between items-center mb-2">
+          <span className="text-xs font-bold text-tech-secondary uppercase tracking-wider flex items-center gap-1">
+             <TrendingUp size={12} /> Market Pulse
+          </span>
+          <div className="w-1.5 h-1.5 bg-tech-cyan rounded-full animate-ping"></div>
+       </div>
+       <div className="text-lg font-bold text-tech-primary font-mono whitespace-nowrap overflow-hidden">
+          <div className="animate-marquee inline-block">
+             {price || "Loading Market Data..."}
+          </div>
+       </div>
+       <div className="mt-2 h-1 w-full bg-tech-bg rounded-full overflow-hidden">
+          <div className="h-full w-1/3 bg-tech-cyan animate-[scan_2s_linear_infinite]"></div>
+       </div>
     </div>
   );
 };

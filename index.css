@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 
+   NOTE: Custom styles have been duplicated to index.html 
+   to ensure they load correctly in preview environments 
+   that do not run the full PostCSS build process.
+*/

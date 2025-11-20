@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { User, QrCode, Map, ShieldCheck, FileText, Droplets, Sprout, Coins, Download, CheckCircle2, MapPin, Layers, History, Award } from 'lucide-react';
+import { User, QrCode, Map, ShieldCheck, FileText, Droplets, Sprout, Coins, Download, CheckCircle2, MapPin, Layers, History, Award, Bug, FileCheck } from 'lucide-react';
 import { AgriPassportData } from '../types';
 
 interface Props {
@@ -24,6 +24,7 @@ export const AgriPassport: React.FC<Props> = ({ t, userLocation, userName }) => 
       { surveyNumber: "124/A", area: "1.5 Acres", type: "Irrigated", ownership: "Sole", status: "Verified" },
       { surveyNumber: "124/B", area: "1.0 Acre", type: "Rainfed", ownership: "Joint", status: "Verified" }
     ],
+    waterSources: ["Tube Well (Shared)", "Canal (Seasonal)"],
     cropsHistory: [
       { year: "2024", season: "Rabi", crop: "Wheat", yield: "22 Qt" },
       { year: "2024", season: "Kharif", crop: "Soybean", yield: "18 Qt" },
@@ -38,6 +39,10 @@ export const AgriPassport: React.FC<Props> = ({ t, userLocation, userName }) => 
       organicCarbon: "0.55%",
       recommendation: "Add DAP and Zinc Sulfate."
     },
+    pestHistory: [
+       { year: "2024", season: "Kharif", crop: "Cotton", pest: "Pink Bollworm", controlMethod: "Pheromone Traps" },
+       { year: "2023", season: "Rabi", crop: "Onion", pest: "Thrips", controlMethod: "Neem Oil" }
+    ],
     financials: {
       creditScore: 780,
       activeLoans: 1,
@@ -48,7 +53,11 @@ export const AgriPassport: React.FC<Props> = ({ t, userLocation, userName }) => 
       soilTested: true,
       advisoryFollowed: 85,
       sustainablePractices: true
-    }
+    },
+    recentReports: [
+       { id: "R-2025-01", generatedDate: "20 Jan 2025", downloadUrl: "#" },
+       { id: "R-2024-11", generatedDate: "15 Nov 2024", downloadUrl: "#" }
+    ]
   };
 
   const handleDownload = () => {
@@ -213,6 +222,20 @@ export const AgriPassport: React.FC<Props> = ({ t, userLocation, userName }) => 
                         </table>
                      </div>
                   </div>
+
+                  {/* Water Source Section */}
+                  <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                     <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-4">
+                        <Droplets size={20} className="text-blue-500" /> Water Sources
+                     </h3>
+                     <div className="flex flex-wrap gap-3">
+                        {passportData.waterSources?.map((source, i) => (
+                           <span key={i} className="px-4 py-2 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-lg text-sm font-medium border border-blue-100 dark:border-blue-800">
+                              {source}
+                           </span>
+                        )) || <span className="text-slate-500 text-sm">No water sources recorded.</span>}
+                     </div>
+                  </div>
                </div>
             )}
 
@@ -220,28 +243,31 @@ export const AgriPassport: React.FC<Props> = ({ t, userLocation, userName }) => 
                <div className="space-y-6 animate-slide-up">
                   {/* Soil Health Card */}
                   <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                     <h3 className="font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                        <Sprout size={20} className="text-amber-600" /> Soil Health Report
-                     </h3>
+                     <div className="flex justify-between items-center mb-4">
+                         <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <Sprout size={20} className="text-amber-600" /> Soil Health Report
+                         </h3>
+                         <span className="text-xs text-slate-400">Date: {passportData.soilHealth.date}</span>
+                     </div>
                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                         <div className="bg-slate-50 dark:bg-slate-800 p-3 rounded-xl text-center">
                            <span className="text-xs text-slate-500 uppercase font-bold">Nitrogen</span>
                            <div className="h-2 bg-slate-200 rounded-full mt-2 overflow-hidden">
-                              <div className="h-full bg-yellow-400 w-[60%]"></div>
+                              <div className={`h-full w-[60%] ${passportData.soilHealth.nitrogen === 'Low' ? 'bg-red-400' : 'bg-green-500'}`}></div>
                            </div>
                            <p className="text-sm font-bold mt-1">{passportData.soilHealth.nitrogen}</p>
                         </div>
                         <div className="bg-slate-50 dark:bg-slate-800 p-3 rounded-xl text-center">
                            <span className="text-xs text-slate-500 uppercase font-bold">Phosphorus</span>
                            <div className="h-2 bg-slate-200 rounded-full mt-2 overflow-hidden">
-                              <div className="h-full bg-red-400 w-[30%]"></div>
+                              <div className={`h-full w-[30%] ${passportData.soilHealth.phosphorus === 'Low' ? 'bg-red-400' : 'bg-green-500'}`}></div>
                            </div>
                            <p className="text-sm font-bold mt-1">{passportData.soilHealth.phosphorus}</p>
                         </div>
                         <div className="bg-slate-50 dark:bg-slate-800 p-3 rounded-xl text-center">
                            <span className="text-xs text-slate-500 uppercase font-bold">Potassium</span>
                            <div className="h-2 bg-slate-200 rounded-full mt-2 overflow-hidden">
-                              <div className="h-full bg-green-500 w-[90%]"></div>
+                              <div className={`h-full w-[90%] ${passportData.soilHealth.potassium === 'Low' ? 'bg-red-400' : 'bg-green-500'}`}></div>
                            </div>
                            <p className="text-sm font-bold mt-1">{passportData.soilHealth.potassium}</p>
                         </div>
@@ -253,6 +279,27 @@ export const AgriPassport: React.FC<Props> = ({ t, userLocation, userName }) => 
                      </div>
                      <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800 rounded-xl text-sm text-amber-800 dark:text-amber-200">
                         <strong>Expert Recommendation:</strong> {passportData.soilHealth.recommendation}
+                     </div>
+                  </div>
+
+                  {/* Pest History */}
+                  <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                     <h3 className="font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                        <Bug size={20} className="text-red-500" /> Pest History
+                     </h3>
+                     <div className="space-y-3">
+                        {passportData.pestHistory?.map((pest, i) => (
+                           <div key={i} className="flex justify-between items-center bg-slate-50 dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700">
+                              <div>
+                                 <p className="font-bold text-slate-900 dark:text-white">{pest.pest}</p>
+                                 <p className="text-xs text-slate-500">{pest.crop} • {pest.season} {pest.year}</p>
+                              </div>
+                              <div className="text-right">
+                                 <span className="block text-xs font-bold text-slate-400 uppercase">Control</span>
+                                 <span className="text-sm text-slate-700 dark:text-slate-300">{pest.controlMethod}</span>
+                              </div>
+                           </div>
+                        )) || <p className="text-sm text-slate-500">No pest history recorded.</p>}
                      </div>
                   </div>
 
@@ -334,6 +381,33 @@ export const AgriPassport: React.FC<Props> = ({ t, userLocation, userName }) => 
                   <Download size={18} /> Generate PDF
                </button>
             </div>
+            
+            {/* Downloaded Reports Section */}
+            {passportData.recentReports && passportData.recentReports.length > 0 && (
+               <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                  <h4 className="font-bold text-slate-900 dark:text-white mb-4 text-sm uppercase tracking-wider flex items-center gap-2">
+                     <FileCheck size={16} className="text-green-500" /> Recent Reports
+                  </h4>
+                  <div className="space-y-3">
+                     {passportData.recentReports.map((report, i) => (
+                        <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
+                           <div className="flex items-center gap-3">
+                              <div className="bg-red-100 dark:bg-red-900/20 p-2 rounded-lg text-red-600 dark:text-red-400">
+                                 <FileText size={16} />
+                              </div>
+                              <div>
+                                 <p className="text-xs font-bold text-slate-700 dark:text-slate-200">Agri Passport</p>
+                                 <p className="text-[10px] text-slate-500">{report.generatedDate}</p>
+                              </div>
+                           </div>
+                           <a href={report.downloadUrl} className="text-blue-600 hover:text-blue-800 p-2">
+                              <Download size={16} />
+                           </a>
+                        </div>
+                     ))}
+                  </div>
+               </div>
+            )}
 
             <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
                <h4 className="font-bold text-slate-900 dark:text-white mb-4 text-sm uppercase tracking-wider">Quick Actions</h4>

@@ -158,7 +158,13 @@ const App: React.FC = () => {
       <>
         {view === 'home' && (
            <>
-             <Hero onNavigate={setView} t={t} userLocation={userLocation} userName={user?.name} />
+             <Hero 
+              onNavigate={setView} 
+              t={t} 
+              userLocation={userLocation} 
+              userName={user?.name} 
+              onOpenWhatsApp={() => setShowWhatsApp(true)}
+             />
              {showTour && <OnboardingTour t={t} onComplete={handleTourComplete} />}
            </>
         )}
@@ -260,11 +266,11 @@ const App: React.FC = () => {
           </div>
         )}
 
-        <main className="flex-grow flex flex-col relative pt-6">
+        <main className="flex-grow flex flex-col relative pt-4 md:pt-6">
           {renderRoleBasedInterface()}
         </main>
 
-        {/* WhatsApp FAB */}
+        {/* WhatsApp FAB - Show only if not triggered via hero button to avoid dupes, or keep for global access */}
         {user?.role === 'farmer' && (
           <>
              <button 

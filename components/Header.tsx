@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Sprout, LogOut, User as UserIcon, Moon, Sun, Globe, Bell, Wifi, WifiOff, CheckCircle2, RefreshCw, ChevronDown, Languages, ArrowLeft, Menu } from 'lucide-react';
+import { Sprout, LogOut, Globe, Bell, Wifi, WifiOff, CheckCircle2, RefreshCw, ArrowLeft, Menu } from 'lucide-react';
 import { User, ViewState, Notification } from '../types';
 import { LANGUAGES } from '../translations';
 import { offlineService } from '../services/offline';
@@ -15,8 +15,6 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ user, onNavigate, onLogout, currentView, language, setLanguage }) => {
-  // Theme toggle mostly for dev/consumer mode, forced dark for Pro
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [syncCount, setSyncCount] = useState(0);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -82,9 +80,9 @@ export const Header: React.FC<HeaderProps> = ({ user, onNavigate, onLogout, curr
         </div>
 
         {/* Right: Controls */}
-        <div className="flex items-center gap-3 md:gap-5">
+        <div className="flex items-center gap-2 md:gap-5">
            
-           {/* Network Status */}
+           {/* Network Status (Hidden on Mobile for cleaner look matching screenshot) */}
            <div 
               className={`hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all cursor-pointer text-xs font-bold tracking-wide ${
                 !isOnline 
@@ -99,11 +97,10 @@ export const Header: React.FC<HeaderProps> = ({ user, onNavigate, onLogout, curr
               <span>{isOnline ? (isSyncing ? 'SYNCING' : syncCount > 0 ? `${syncCount} PENDING` : 'ONLINE') : 'OFFLINE'}</span>
            </div>
 
-          {/* Language */}
+          {/* Language Globe */}
           <div className="relative group">
-            <button className="flex items-center gap-2 px-3 py-2 text-xs font-bold text-tech-primary hover:text-tech-cyan transition-colors uppercase tracking-wider">
-              <Globe size={16} />
-              <span className="hidden md:inline">{language}</span>
+            <button className="p-2 text-tech-primary hover:text-tech-cyan transition-colors">
+              <Globe size={20} />
             </button>
             
             {/* Dropdown */}
@@ -135,13 +132,9 @@ export const Header: React.FC<HeaderProps> = ({ user, onNavigate, onLogout, curr
             </button>
           )}
 
-          {/* User Profile */}
+          {/* Logout / Exit */}
           {user && (
-            <div className="flex items-center gap-3 pl-4 border-l border-tech-border">
-               <div className="text-right hidden md:block">
-                  <span className="block text-sm font-bold text-tech-primary leading-none">{user.name}</span>
-                  <span className="text-[10px] text-tech-cyan uppercase tracking-wider">{user.role}</span>
-               </div>
+            <div className="flex items-center border-l border-tech-border pl-2 ml-2">
                <button 
                   onClick={onLogout}
                   className="p-2 text-tech-secondary hover:text-red-400 transition-colors"

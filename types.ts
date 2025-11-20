@@ -258,6 +258,20 @@ export interface SoilReport {
   recommendation: string;
 }
 
+export interface PestHistoryRecord {
+  year: string;
+  season: string;
+  crop: string;
+  pest: string;
+  controlMethod: string;
+}
+
+export interface PassportReport {
+  id: string;
+  generatedDate: string;
+  downloadUrl: string;
+}
+
 export interface AgriPassportData {
   farmerId: string;
   name: string;
@@ -279,6 +293,9 @@ export interface AgriPassportData {
     advisoryFollowed: number; // Percentage
     sustainablePractices: boolean;
   };
+  waterSources?: string[];
+  pestHistory?: PestHistoryRecord[];
+  recentReports?: PassportReport[];
 }
 
 // NEW: Community & Social Types

@@ -397,7 +397,7 @@ export const AgriPassport: React.FC<Props> = ({ t, userLocation, userName }) => 
                               </div>
                               <div>
                                  <p className="text-xs font-bold text-slate-700 dark:text-slate-200">Agri Passport</p>
-                                 <p className="text-[10px] text-slate-500">{report.generatedDate}</p>
+                                 <p className="text--[10px] text-slate-500">{report.generatedDate}</p>
                               </div>
                            </div>
                            <a href={report.downloadUrl} className="text-blue-600 hover:text-blue-800 p-2">

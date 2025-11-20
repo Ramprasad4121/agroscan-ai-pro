@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Camera, Mic, Video, Droplets, Calendar, Calculator, Shield, Warehouse, Globe, Store, PieChart, Zap, Users, FileText, Plane, Leaf, ArrowRight, TrendingUp, CloudSun, MessageCircle, Landmark } from 'lucide-react';
+import { Camera, Mic, Video, Droplets, Calendar, Calculator, Shield, Warehouse, Globe, Store, PieChart, Zap, Users, FileText, Plane, Leaf, ArrowRight, TrendingUp, CloudSun, Landmark, Sprout } from 'lucide-react';
 import { ViewState } from '../types';
 import { WeatherWidget, MandiTicker } from './DashboardWidgets';
 
@@ -16,6 +16,7 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, t, userLocation, userNam
   const tools = [
     { id: 'passport', title: t.passport_title || "Agri Passport", icon: FileText, path: 'passport' },
     { id: 'schemes', title: t.schemes_title || "Finance & Schemes", icon: Landmark, path: 'schemes' },
+    { id: 'recommend', title: t.rec_title, icon: Sprout, path: 'recommend' },
     { id: 'water', title: t.water_title, icon: Droplets, path: 'water' },
     { id: 'calendar', title: t.calendar_title, icon: Calendar, path: 'calendar' },
     { id: 'fertilizer', title: t.fert_title, icon: Calculator, path: 'fertilizer' },
@@ -68,6 +69,7 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, t, userLocation, userNam
 
       {/* Main Action: Scan Crop Health */}
       <div 
+         id="tour-diagnose"
          onClick={() => onNavigate('scan')} 
          className="tech-card p-8 mb-6 relative overflow-hidden group cursor-pointer border border-tech-border hover:border-tech-cyan/50 transition-all duration-500 min-h-[220px] flex items-center"
       >
@@ -92,30 +94,20 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, t, userLocation, userNam
            </div>
       </div>
 
-      {/* Bottom Action Row: Assistant & Voice */}
-      <div className="grid grid-cols-2 gap-4 mb-10">
+      {/* Bottom Action Row: Assistant */}
+      <div className="mb-10">
          {/* Assistant (Mic) */}
          <div 
             onClick={() => onNavigate('live')}
-            className="tech-card p-6 cursor-pointer group hover:bg-tech-cardHover transition-colors"
+            className="tech-card p-6 cursor-pointer group hover:bg-tech-cardHover transition-colors flex items-center gap-6"
          >
-            <div className="w-12 h-12 bg-tech-bg rounded-xl border border-tech-border flex items-center justify-center mb-4 group-hover:border-tech-amber/50 transition-colors">
-               <Mic size={24} className="text-tech-amber" />
+            <div className="w-16 h-16 bg-tech-bg rounded-2xl border border-tech-border flex items-center justify-center group-hover:border-tech-amber/50 transition-colors shrink-0">
+               <Mic size={32} className="text-tech-amber" />
             </div>
-            <h3 className="text-xl font-bold text-white mb-1">Assistant</h3>
-            <p className="text-[10px] text-tech-secondary uppercase tracking-wider">Talk to AI Expert</p>
-         </div>
-
-         {/* Voice (Chat) */}
-         <div 
-            onClick={onOpenWhatsApp}
-            className="tech-card p-6 cursor-pointer group relative overflow-hidden flex flex-col items-center justify-center text-center hover:bg-tech-cardHover transition-colors"
-         >
-             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 block absolute top-4 right-4">VOICE</span>
-             
-             <div className="w-16 h-16 rounded-full bg-[#25D366] flex items-center justify-center shadow-[0_0_25px_rgba(37,211,102,0.5)] group-hover:scale-110 transition-transform duration-300 mt-2">
-                <MessageCircle size={32} fill="white" className="text-white" />
-             </div>
+            <div>
+                <h3 className="text-2xl font-bold text-white mb-1">Assistant</h3>
+                <p className="text-tech-secondary text-xs uppercase tracking-wider">Talk to AI Expert</p>
+            </div>
          </div>
       </div>
 
@@ -141,6 +133,7 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, t, userLocation, userNam
             {tools.map((tool) => (
                <div 
                   key={tool.id}
+                  id={`tour-${tool.id}`}
                   onClick={() => onNavigate(tool.path as ViewState)}
                   className="tech-card p-4 flex flex-col items-center justify-center text-center gap-3 hover:bg-tech-cardHover cursor-pointer group min-h-[120px]"
                >

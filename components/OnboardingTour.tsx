@@ -38,6 +38,11 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ t, onComplete })
       targetId: 'tour-schemes',
       titleKey: 'tour_schemes_title',
       descKey: 'tour_schemes_desc'
+    },
+    {
+      targetId: 'tour-market',
+      titleKey: 'tour_market_title',
+      descKey: 'tour_market_desc'
     }
   ];
 
@@ -183,32 +188,35 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ t, onComplete })
         <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
           {t[current.titleKey]}
         </h3>
-        <p className="text-slate-600 dark:text-slate-300 mb-2 leading-relaxed text-sm">
+        <p className="text-slate-600 dark:text-slate-300 mb-4 leading-relaxed text-sm">
           {t[current.descKey]}
         </p>
 
         <div className="flex items-center justify-between mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
-          <button 
-            onClick={handleBack}
-            disabled={currentStep === 0}
-            className={`text-sm font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 px-3 py-2 transition-colors ${currentStep === 0 ? 'opacity-0 cursor-default' : ''}`}
+           <button 
+            onClick={onComplete}
+            className="text-xs font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
           >
-            Back
+            {t.tour_skip}
           </button>
-          
-          <div className="flex gap-1.5">
-             {steps.map((_, i) => (
-                <div key={i} className={`w-2 h-2 rounded-full transition-all duration-300 ${i === currentStep ? 'bg-agro-600 scale-125' : 'bg-slate-200 dark:bg-slate-700'}`} />
-             ))}
-          </div>
 
-          <button 
-            onClick={handleNext}
-            className="px-5 py-2.5 bg-agro-600 hover:bg-agro-700 text-white rounded-xl font-bold shadow-lg shadow-agro-200/50 dark:shadow-none transition-all flex items-center gap-2 text-sm"
-          >
-            {isLast ? (t.tour_finish || 'Finish') : (t.tour_next || 'Next')}
-            {isLast ? <Check size={16} /> : <ArrowRight size={16} />}
-          </button>
+          <div className="flex gap-2">
+            {currentStep > 0 && (
+              <button 
+                onClick={handleBack}
+                className="text-sm font-bold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg transition-colors"
+              >
+                Back
+              </button>
+            )}
+            <button 
+              onClick={handleNext}
+              className="px-5 py-2.5 bg-agro-600 hover:bg-agro-700 text-white rounded-xl font-bold shadow-lg shadow-agro-200/50 dark:shadow-none transition-all flex items-center gap-2 text-sm"
+            >
+              {isLast ? (t.tour_finish || 'Finish') : (t.tour_next || 'Next')}
+              {isLast ? <Check size={16} /> : <ArrowRight size={16} />}
+            </button>
+          </div>
         </div>
       </div>
     );

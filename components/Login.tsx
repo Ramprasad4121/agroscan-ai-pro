@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Sprout, ArrowRight, Lock, Phone, User as UserIcon, Briefcase, Building2, ShoppingBag, Landmark, ShieldCheck, Truck, Settings, ArrowLeft, MapPin, Mail, Check, Mic, Shield, Server, Users } from 'lucide-react';
+import { Sprout, ArrowRight, Lock, Phone, User as UserIcon, Briefcase, Building2, ShoppingBag, Landmark, ShieldCheck, Truck, Settings, ArrowLeft, MapPin, Mail, Check, Mic, Shield, Server } from 'lucide-react';
 import { User, UserRole } from '../types';
 import { authService } from '../services/api';
 
@@ -35,7 +35,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, t }) => {
 
   const roles = [
     { id: 'farmer', label: t.role_farmer, icon: <Sprout size={24} />, desc: t.role_farmer_desc, color: 'bg-green-50 border-green-200 text-green-700' },
-    { id: 'fpo', label: t.role_fpo || "FPO Group", icon: <Users size={24} />, desc: t.role_fpo_desc || "Manage Members & Trade", color: 'bg-teal-50 border-teal-200 text-teal-700' },
+    { id: 'fpo', label: t.role_fpo || "FPO Group", icon: <UsersIcon />, desc: t.role_fpo_desc || "Manage Members", color: 'bg-teal-50 border-teal-200 text-teal-700' },
     { id: 'consumer', label: t.role_consumer, icon: <ShoppingBag size={24} />, desc: t.role_consumer_desc, color: 'bg-orange-50 border-orange-200 text-orange-700' },
     { id: 'govt', label: t.role_govt, icon: <Landmark size={24} />, desc: t.role_govt_desc, color: 'bg-amber-50 border-amber-200 text-amber-700' },
     { id: 'bank', label: t.role_bank, icon: <Briefcase size={24} />, desc: t.role_bank_desc, color: 'bg-blue-50 border-blue-200 text-blue-700' },
@@ -83,16 +83,14 @@ export const Login: React.FC<LoginProps> = ({ onLogin, t }) => {
     }
   };
 
-  // Voice Fill Simulation for Farmers
   const handleVoiceFill = () => {
     if (role !== 'farmer') return;
-    // Simulate voice input filling the form
     setFullName("Ram Kishan");
     setLocation("Nashik");
     setIdentifier("9876543210");
     setLandSize("2.5");
     setMainCrop("Onion");
-    setPassword("1234"); // Simulating simple PIN setup via voice
+    setPassword("1234");
     setConsent({ terms: true, data: true, location: true });
   };
 
@@ -121,45 +119,37 @@ export const Login: React.FC<LoginProps> = ({ onLogin, t }) => {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-slate-50 dark:bg-slate-950 relative overflow-hidden transition-colors duration-300 py-6 px-4">
+    <div className="min-h-screen w-full flex items-center justify-center py-6 px-4">
       
-      {/* Background Decoration */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-agro-100 dark:bg-agro-900/20 rounded-full blur-3xl opacity-40"></div>
-        <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-blue-100 dark:bg-blue-900/20 rounded-full blur-3xl opacity-40"></div>
-        <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '32px 32px' }}></div>
-      </div>
-
-      <div className="w-full max-w-6xl relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-center">
+      <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-center">
         
         {/* Brand Section (Left) */}
-        <div className="lg:col-span-5 text-center lg:text-left space-y-8 animate-fade-in">
-          <div className="inline-flex items-center justify-center w-24 h-24 rounded-[2rem] bg-gradient-to-br from-agro-500 to-agro-700 text-white shadow-2xl shadow-agro-200 dark:shadow-none mb-2">
+        <div className="lg:col-span-5 text-center lg:text-left space-y-8 animate-fade-in bg-black/20 p-8 rounded-3xl backdrop-blur-sm border border-white/10">
+          <div className="inline-flex items-center justify-center w-24 h-24 rounded-[2rem] bg-[#388E3C] text-white shadow-2xl shadow-green-900/50 mb-2">
             <Sprout size={48} />
           </div>
           <div>
-             <h1 className="text-4xl md:text-6xl font-display font-bold text-slate-900 dark:text-white mb-6 leading-tight">
-               {t.app_name.split(' ')[0]}<span className="text-agro-600">Ai</span> Pro
+             <h1 className="text-4xl md:text-6xl font-display font-bold text-white mb-6 leading-tight drop-shadow-lg">
+               {t.app_name.split(' ')[0]}<span className="text-green-300">Ai</span> Pro
              </h1>
-             <p className="text-xl text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+             <p className="text-xl text-white/90 font-medium leading-relaxed drop-shadow-md">
                {t.app_tagline}
              </p>
-             <div className="mt-6 flex flex-wrap justify-center lg:justify-start gap-3 text-sm font-semibold text-slate-400">
-                <span className="px-3 py-1 bg-white dark:bg-slate-900 rounded-full border border-slate-200 dark:border-slate-800 flex items-center gap-2">
+             <div className="mt-6 flex flex-wrap justify-center lg:justify-start gap-3 text-sm font-semibold text-white/80">
+                <span className="px-3 py-1 bg-white/10 rounded-full border border-white/20 flex items-center gap-2 backdrop-blur-md">
                   <Server size={14} /> API Gateway
                 </span>
-                <span className="px-3 py-1 bg-white dark:bg-slate-900 rounded-full border border-slate-200 dark:border-slate-800 flex items-center gap-2">
+                <span className="px-3 py-1 bg-white/10 rounded-full border border-white/20 flex items-center gap-2 backdrop-blur-md">
                   <Shield size={14} /> Secure Consent Ledger
                 </span>
              </div>
           </div>
         </div>
 
-        {/* Login Interface (Right) */}
+        {/* Login Interface (Right) - Glassmorphism */}
         <div className="lg:col-span-7">
-          <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden transition-colors min-h-[600px] flex flex-col relative">
+          <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-white/50 dark:border-slate-700 overflow-hidden transition-colors min-h-[600px] flex flex-col relative">
             
-            {/* STEP 1: Role Selection Gateway */}
             {!role ? (
               <div className="p-8 md:p-10 flex-grow flex flex-col animate-slide-up">
                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2 text-center">{t.role_select_title}</h2>
@@ -184,7 +174,6 @@ export const Login: React.FC<LoginProps> = ({ onLogin, t }) => {
               </div>
             ) : (
               <div className="flex flex-col h-full animate-slide-up">
-                 {/* Header with Back Button */}
                  <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center gap-4 bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm sticky top-0 z-20">
                     <button onClick={() => setRole(null)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-500">
                        <ArrowLeft size={20} />
@@ -200,9 +189,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, t }) => {
                     </div>
                  </div>
 
-                 {/* Form Content */}
                  <div className="p-8 md:p-12 flex-grow flex flex-col justify-center max-w-lg mx-auto w-full overflow-y-auto relative">
-                    {/* Farmer Voice Assistant Hint */}
                     {role === 'farmer' && mode === 'signup' && (
                       <button 
                          onClick={handleVoiceFill}
@@ -213,13 +200,11 @@ export const Login: React.FC<LoginProps> = ({ onLogin, t }) => {
                     )}
 
                     <form onSubmit={handleSubmit} className="space-y-5">
-                       {/* Toggle */}
                        <div className="flex bg-slate-100 dark:bg-slate-800 p-1.5 rounded-xl mb-6">
                           <button type="button" onClick={() => setMode('login')} className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${mode === 'login' ? 'bg-white dark:bg-slate-700 shadow-md text-slate-900 dark:text-white' : 'text-slate-500'}`}>{t.login_btn}</button>
                           <button type="button" onClick={() => setMode('signup')} className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${mode === 'signup' ? 'bg-white dark:bg-slate-700 shadow-md text-slate-900 dark:text-white' : 'text-slate-500'}`}>{t.new_account}</button>
                        </div>
 
-                       {/* Dynamic Fields based on Role & Mode */}
                        {mode === 'signup' && (
                          <div className="animate-fade-in-up space-y-5 border-b border-slate-100 dark:border-slate-800 pb-6 mb-6">
                             <div className="grid grid-cols-1 gap-4">
@@ -231,7 +216,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, t }) => {
                                          type="text" 
                                          value={fullName}
                                          onChange={(e) => setFullName(e.target.value)}
-                                         className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-agro-500/20 focus:border-agro-500 transition-all text-sm"
+                                         className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#388E3C]/20 focus:border-[#388E3C] transition-all text-sm"
                                          placeholder={t.full_name}
                                       />
                                    </div>
@@ -246,14 +231,13 @@ export const Login: React.FC<LoginProps> = ({ onLogin, t }) => {
                                         type="text" 
                                         value={location}
                                         onChange={(e) => setLocation(e.target.value)}
-                                        className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-agro-500/20 focus:border-agro-500 transition-all text-sm"
+                                        className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#388E3C]/20 focus:border-[#388E3C] transition-all text-sm"
                                         placeholder={role === 'farmer' ? "e.g. Nashik" : "e.g. Mumbai"}
                                      />
                                   </div>
                                </div>
                             </div>
 
-                            {/* Farmer Specific */}
                             {role === 'farmer' && (
                                <div className="grid grid-cols-2 gap-4 bg-green-50 dark:bg-green-900/20 p-4 rounded-xl border border-green-100 dark:border-green-900/30">
                                   <div>
@@ -279,7 +263,6 @@ export const Login: React.FC<LoginProps> = ({ onLogin, t }) => {
                                </div>
                             )}
 
-                            {/* Corporate & FPO Specific */}
                             {(role === 'bank' || role === 'govt' || role === 'company' || role === 'insurance' || role === 'fpo') && (
                                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-900/30 space-y-3">
                                   <div>
@@ -320,7 +303,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, t }) => {
                                 required
                                 value={identifier}
                                 onChange={(e) => setIdentifier(e.target.value)}
-                                className="w-full pl-12 pr-4 py-3.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-agro-500/20 focus:border-agro-500 transition-all font-medium placeholder:text-slate-400"
+                                className="w-full pl-12 pr-4 py-3.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#388E3C]/20 focus:border-[#388E3C] transition-all font-medium placeholder:text-slate-400"
                                 placeholder={getPlaceholder()}
                              />
                           </div>
@@ -329,23 +312,22 @@ export const Login: React.FC<LoginProps> = ({ onLogin, t }) => {
                        <div>
                           <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 ml-1">{t.password_label}</label>
                           <div className="relative group">
-                             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-agro-500 transition-colors" size={20} />
+                             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#388E3C] transition-colors" size={20} />
                              <input 
                                 type="password" 
                                 required
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full pl-12 pr-4 py-3.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-agro-500/20 focus:border-agro-500 transition-all font-medium placeholder:text-slate-400"
+                                className="w-full pl-12 pr-4 py-3.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#388E3C]/20 focus:border-[#388E3C] transition-all font-medium placeholder:text-slate-400"
                                 placeholder="••••••"
                              />
                           </div>
                        </div>
 
-                       {/* Consent Framework */}
                        {mode === 'signup' && (
                          <div className="space-y-3 pt-2">
                             <label className="flex items-start gap-3 cursor-pointer group">
-                               <div className={`w-5 h-5 rounded border border-slate-300 dark:border-slate-600 flex items-center justify-center transition-colors ${consent.terms ? 'bg-agro-600 border-agro-600' : 'bg-white dark:bg-slate-800'}`}>
+                               <div className={`w-5 h-5 rounded border border-slate-300 dark:border-slate-600 flex items-center justify-center transition-colors ${consent.terms ? 'bg-[#388E3C] border-[#388E3C]' : 'bg-white dark:bg-slate-800'}`}>
                                   {consent.terms && <Check size={12} className="text-white" />}
                                </div>
                                <input type="checkbox" className="hidden" checked={consent.terms} onChange={e => setConsent({...consent, terms: e.target.checked})} />
@@ -354,7 +336,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, t }) => {
 
                             {role === 'farmer' && (
                               <label className="flex items-start gap-3 cursor-pointer group">
-                                 <div className={`w-5 h-5 rounded border border-slate-300 dark:border-slate-600 flex items-center justify-center transition-colors ${consent.data ? 'bg-agro-600 border-agro-600' : 'bg-white dark:bg-slate-800'}`}>
+                                 <div className={`w-5 h-5 rounded border border-slate-300 dark:border-slate-600 flex items-center justify-center transition-colors ${consent.data ? 'bg-[#388E3C] border-[#388E3C]' : 'bg-white dark:bg-slate-800'}`}>
                                     {consent.data && <Check size={12} className="text-white" />}
                                  </div>
                                  <input type="checkbox" className="hidden" checked={consent.data} onChange={e => setConsent({...consent, data: e.target.checked})} />
@@ -366,7 +348,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, t }) => {
                             
                             {(role === 'consumer' || role === 'service_provider') && (
                               <label className="flex items-start gap-3 cursor-pointer group">
-                                 <div className={`w-5 h-5 rounded border border-slate-300 dark:border-slate-600 flex items-center justify-center transition-colors ${consent.location ? 'bg-agro-600 border-agro-600' : 'bg-white dark:bg-slate-800'}`}>
+                                 <div className={`w-5 h-5 rounded border border-slate-300 dark:border-slate-600 flex items-center justify-center transition-colors ${consent.location ? 'bg-[#388E3C] border-[#388E3C]' : 'bg-white dark:bg-slate-800'}`}>
                                     {consent.location && <Check size={12} className="text-white" />}
                                  </div>
                                  <input type="checkbox" className="hidden" checked={consent.location} onChange={e => setConsent({...consent, location: e.target.checked})} />
@@ -376,7 +358,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, t }) => {
 
                             {(role === 'bank' || role === 'govt' || role === 'fpo') && (
                                <label className="flex items-start gap-3 cursor-pointer group">
-                                  <div className={`w-5 h-5 rounded border border-slate-300 dark:border-slate-600 flex items-center justify-center transition-colors ${consent.data ? 'bg-agro-600 border-agro-600' : 'bg-white dark:bg-slate-800'}`}>
+                                  <div className={`w-5 h-5 rounded border border-slate-300 dark:border-slate-600 flex items-center justify-center transition-colors ${consent.data ? 'bg-[#388E3C] border-[#388E3C]' : 'bg-white dark:bg-slate-800'}`}>
                                      {consent.data && <Check size={12} className="text-white" />}
                                   </div>
                                   <input type="checkbox" className="hidden" checked={consent.data} onChange={e => setConsent({...consent, data: e.target.checked})} />
@@ -390,9 +372,9 @@ export const Login: React.FC<LoginProps> = ({ onLogin, t }) => {
                           type="submit"
                           disabled={loading || !isFormValid()}
                           className={`w-full py-4 text-white font-bold text-lg rounded-xl shadow-lg hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2 mt-6 disabled:opacity-50 disabled:cursor-not-allowed ${
-                             role === 'farmer' ? 'bg-agro-600 hover:bg-agro-700 shadow-agro-200' : 
-                             role === 'consumer' ? 'bg-orange-600 hover:bg-orange-700 shadow-orange-200' : 
-                             role === 'fpo' ? 'bg-teal-600 hover:bg-teal-700 shadow-teal-200' :
+                             role === 'farmer' ? 'bg-[#388E3C] hover:bg-green-700 shadow-green-200/50' : 
+                             role === 'consumer' ? 'bg-orange-600 hover:bg-orange-700 shadow-orange-200/50' : 
+                             role === 'fpo' ? 'bg-teal-600 hover:bg-teal-700 shadow-teal-200/50' :
                              'bg-slate-900 hover:bg-slate-800'
                           }`}
                        >
@@ -412,3 +394,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, t }) => {
     </div>
   );
 };
+
+const UsersIcon = () => (
+   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+);

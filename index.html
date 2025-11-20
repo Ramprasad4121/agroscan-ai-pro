@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -33,6 +34,7 @@
                 800: '#166534',
                 900: '#14532d',
                 950: '#052e16',
+                primary: '#388E3C', // Custom Requested Color
               }
             },
             animation: {
@@ -55,22 +57,16 @@
       }
     </script>
     
-    <!-- Custom Styles (Scrollbar & Glass & Background) -->
+    <!-- Custom Styles (Scrollbar & Glass) -->
     <style>
       body {
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
-        /* Base Color */
-        background-color: #f8fafc; 
-        /* Tech Dot Pattern */
-        background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
-        background-size: 32px 32px;
-        background-attachment: fixed;
+        background-color: #f8fafc;
       }
       
       html.dark body {
         background-color: #020617;
-        background-image: radial-gradient(#1e293b 1.5px, transparent 1.5px);
       }
 
       /* Custom scrollbar */

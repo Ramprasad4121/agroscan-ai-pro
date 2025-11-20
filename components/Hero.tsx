@@ -55,30 +55,30 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, t, userLocation, userNam
   return (
     <div className="relative bg-transparent min-h-screen pb-20 transition-colors duration-300 font-sans">
       
-      {/* Header Section */}
-      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 pb-8 pt-6 px-4 md:px-8 sticky top-0 z-30 shadow-sm">
+      {/* Header Section - Transparent to show background field */}
+      <div className="pb-8 pt-6 px-4 md:px-8 sticky top-0 z-30">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
             <div>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
+              <p className="text-xs font-bold text-white uppercase tracking-wider mb-1 drop-shadow-md">
                 {new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })}
               </p>
-              <h1 className="text-2xl md:text-3xl font-display font-bold text-slate-900 dark:text-white">
-                {t.welcome_farmer || greeting}, <span className="text-agro-600">{userName || 'Farmer'}</span>
+              <h1 className="text-2xl md:text-3xl font-display font-bold text-white drop-shadow-lg">
+                {t.welcome_farmer || greeting}, <span className="text-yellow-300">{userName || 'Farmer'}</span>
               </h1>
             </div>
             
             <div className="flex gap-3 w-full md:w-auto">
                <button 
                  onClick={() => onNavigate('live')}
-                 className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-900/20 dark:text-rose-300 px-5 py-2.5 rounded-xl font-bold transition-colors"
+                 className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-white/90 hover:bg-white text-[#388E3C] px-5 py-2.5 rounded-xl font-bold transition-colors shadow-lg"
                >
                   <Mic size={18} />
                   <span>{t.live_title}</span>
                </button>
                <button 
                  onClick={() => onNavigate('scan')}
-                 className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-slate-900 text-white hover:bg-slate-800 dark:bg-white dark:text-slate-900 px-5 py-2.5 rounded-xl font-bold shadow-lg shadow-slate-200 dark:shadow-none transition-all"
+                 className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-slate-900 text-white hover:bg-slate-800 px-5 py-2.5 rounded-xl font-bold shadow-lg transition-all"
                >
                   <Camera size={18} />
                   <span>{t.quick_scan}</span>
@@ -88,14 +88,14 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, t, userLocation, userNam
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 md:px-8 py-8 space-y-10">
+      <div className="max-w-6xl mx-auto px-4 md:px-8 py-2 space-y-10">
         
         {/* Priority Widgets Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-           <div className="h-40 rounded-2xl overflow-hidden shadow-sm border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
+           <div className="h-40 rounded-2xl overflow-hidden shadow-sm border border-white/50 bg-white/90 backdrop-blur-sm dark:bg-slate-900/90">
               <WeatherWidget userLocation={userLocation || null} t={t} />
            </div>
-           <div className="h-40 rounded-2xl overflow-hidden shadow-sm border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
+           <div className="h-40 rounded-2xl overflow-hidden shadow-sm border border-white/50 bg-white/90 backdrop-blur-sm dark:bg-slate-900/90">
               <MandiTicker userLocation={userLocation || null} t={t} />
            </div>
         </div>
@@ -104,7 +104,7 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, t, userLocation, userNam
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div 
               onClick={() => onNavigate('scan')}
-              className="md:col-span-2 relative overflow-hidden bg-gradient-to-br from-agro-600 to-emerald-700 rounded-3xl p-8 text-white shadow-xl shadow-agro-200 dark:shadow-none group cursor-pointer hover:scale-[1.01] transition-transform"
+              className="md:col-span-2 relative overflow-hidden bg-gradient-to-br from-[#388E3C] to-emerald-800 rounded-3xl p-8 text-white shadow-xl group cursor-pointer hover:scale-[1.01] transition-transform border border-white/20"
             >
                 <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
                   <Leaf size={180} />
@@ -113,12 +113,12 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, t, userLocation, userNam
                    <div>
                       <span className="inline-block px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-bold mb-3 border border-white/10">AI Diagnosis</span>
                       <h2 className="text-3xl font-bold mb-2">{t.diagnose_now || "Check Crop Health"}</h2>
-                      <p className="text-agro-100 max-w-md text-sm md:text-base leading-relaxed">
+                      <p className="text-green-50 max-w-md text-sm md:text-base leading-relaxed">
                         {t.analyzing_desc || "Take a photo of your plant. Our AI will detect diseases, pests, and nutrient deficiencies instantly."}
                       </p>
                    </div>
                    <div className="mt-6 flex items-center gap-3">
-                      <span className="bg-white text-agro-700 px-5 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 shadow-sm">
+                      <span className="bg-white text-[#388E3C] px-5 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 shadow-sm">
                          <Camera size={18} /> Start Scan
                       </span>
                    </div>
@@ -127,7 +127,7 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, t, userLocation, userNam
 
             <div 
                onClick={() => onNavigate('video')}
-               className="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-100 dark:border-slate-800 shadow-sm group cursor-pointer hover:border-blue-200 dark:hover:border-blue-800 transition-colors relative overflow-hidden"
+               className="bg-white/95 backdrop-blur-sm dark:bg-slate-900/90 rounded-3xl p-8 border border-white/50 dark:border-slate-800 shadow-sm group cursor-pointer hover:border-blue-400 transition-colors relative overflow-hidden"
             >
                <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-blue-50 dark:bg-blue-900/20 rounded-full blur-2xl group-hover:scale-150 transition-transform"></div>
                <div className="relative z-10 h-full flex flex-col justify-between">
@@ -148,28 +148,28 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, t, userLocation, userNam
         </div>
 
         {/* Categorized Features */}
-        {categories.map((cat, idx) => (
-           <div key={idx} className="space-y-4 animate-slide-up" style={{animationDelay: `${idx * 100}ms`}}>
-              <div className="flex items-end justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
-                 <div>
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-white">{cat.title}</h3>
-                    <p className="text-slate-400 text-xs hidden sm:block">{cat.subtitle}</p>
+        <div className="bg-white/80 dark:bg-slate-950/80 backdrop-blur-md rounded-[2.5rem] p-6 md:p-8 border border-white/20 shadow-xl">
+           {categories.map((cat, idx) => (
+              <div key={idx} className="space-y-4 animate-slide-up mb-10 last:mb-0" style={{animationDelay: `${idx * 100}ms`}}>
+                 <div className="flex items-end justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
+                    <div>
+                       <h3 className="text-lg font-bold text-slate-900 dark:text-white">{cat.title}</h3>
+                       <p className="text-slate-500 text-xs hidden sm:block">{cat.subtitle}</p>
+                    </div>
+                 </div>
+                 
+                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {cat.items.map((item: any) => (
+                       <FeatureCard 
+                          key={item.id}
+                          item={item}
+                          onClick={() => onNavigate(item.path)}
+                       />
+                    ))}
                  </div>
               </div>
-              
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                 {cat.items.map((item: any) => (
-                    <FeatureCard 
-                       key={item.id}
-                       item={item}
-                       onClick={() => onNavigate(item.path)}
-                    />
-                 ))}
-              </div>
-           </div>
-        ))}
-        
-        {/* WhatsApp FAB is handled in App.tsx, but we can add a banner here if needed */}
+           ))}
+        </div>
       </div>
     </div>
   );
@@ -186,7 +186,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ item, onClick }) => {
    return (
       <div 
          onClick={onClick}
-         className="relative bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-600 shadow-sm hover:shadow-md transition-all group cursor-pointer overflow-hidden h-full flex flex-col"
+         className="relative bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-[#388E3C] dark:hover:border-green-500 shadow-sm hover:shadow-md transition-all group cursor-pointer overflow-hidden h-full flex flex-col"
       >
          <div className="flex justify-between items-start mb-4 relative z-10">
             <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${item.bg} ${item.color} transition-transform group-hover:scale-110`}>
@@ -205,7 +205,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ item, onClick }) => {
             </button>
          </div>
          
-         <h4 className="text-base font-bold text-slate-900 dark:text-white mb-1 group-hover:text-agro-600 dark:group-hover:text-agro-400 transition-colors relative z-10">
+         <h4 className="text-base font-bold text-slate-900 dark:text-white mb-1 group-hover:text-[#388E3C] dark:group-hover:text-green-400 transition-colors relative z-10">
             {item.title}
          </h4>
          <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 relative z-10">
@@ -217,7 +217,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ item, onClick }) => {
             <p className="text-xs font-medium text-slate-600 dark:text-slate-300 leading-relaxed">
                {item.desc}
             </p>
-            <span className="mt-3 text-[10px] font-bold text-agro-600 uppercase tracking-wider">Click to Open</span>
+            <span className="mt-3 text-[10px] font-bold text-[#388E3C] uppercase tracking-wider">Click to Open</span>
          </div>
       </div>
    );

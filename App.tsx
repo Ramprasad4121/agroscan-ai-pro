@@ -138,9 +138,62 @@ const App: React.FC = () => {
     window.open(whatsappUrl, '_blank');
   };
 
+  // --- BACKGROUND LOGIC ---
+  // We use a high-quality illustration-style field image.
+  const BACKGROUND_IMAGE = "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?q=80&w=1920&auto=format&fit=crop";
+  
+  const getBackgroundStyles = () => {
+    const baseStyle = "min-h-screen flex flex-col transition-colors duration-500 font-sans selection:bg-green-200 selection:text-green-900 ";
+    
+    // 1. Login Screen
+    if (view === 'login') {
+      return {
+        className: baseStyle + "bg-cover bg-center bg-fixed relative",
+        style: { backgroundImage: `url(${BACKGROUND_IMAGE})` },
+        overlayClass: "absolute inset-0 bg-black/10 backdrop-blur-[1px]"
+      };
+    }
+
+    // 2. Stakeholder (Bank/Govt/Company/Insurance) - Corporate Feel
+    // Uses the same image but with a heavy Blue-Grey Overlay
+    if (user && ['govt', 'bank', 'company', 'insurance', 'admin'].includes(user.role)) {
+      return {
+        className: baseStyle + "bg-cover bg-center bg-fixed relative",
+        style: { backgroundImage: `url(${BACKGROUND_IMAGE})` },
+        overlayClass: "absolute inset-0 bg-slate-900/90 backdrop-blur-sm"
+      };
+    }
+
+    // 3. Farmer / Consumer Dashboard (Home) - Fresh Feel
+    // Uses the image with a light overlay to keep it vibrant
+    if ((user?.role === 'farmer' || user?.role === 'consumer') && view === 'home') {
+      return {
+        className: baseStyle + "bg-cover bg-center bg-fixed relative",
+        style: { backgroundImage: `url(${BACKGROUND_IMAGE})` },
+        overlayClass: "absolute inset-0 bg-white/10" // Very light overlay
+      };
+    }
+
+    // 4. Inner Pages (Tools, Forms, Details) - Clean White/Light Background for Readability
+    return {
+      className: baseStyle + "bg-slate-50 dark:bg-slate-950",
+      style: {},
+      overlayClass: "hidden"
+    };
+  };
+
+  const bgConfig = getBackgroundStyles();
+
   // 1. LOGIN SCREEN (First Priority)
   if (view === 'login') {
-    return <Login onLogin={handleLogin} t={t} />;
+    return (
+      <div className={bgConfig.className} style={bgConfig.style}>
+         <div className={bgConfig.overlayClass}></div>
+         <div className="relative z-10 w-full h-full flex flex-col">
+            <Login onLogin={handleLogin} t={t} />
+         </div>
+      </div>
+    );
   }
 
   // 2. FORCE LANGUAGE SELECTION (Post-Login)
@@ -255,73 +308,71 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-transparent font-sans selection:bg-agro-200 dark:selection:bg-agro-900 selection:text-agro-900 dark:selection:text-agro-100 transition-colors duration-300 relative">
-      
-      {/* Global Ambient Background */}
-      <div className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden">
-         <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-green-300/10 dark:bg-green-900/20 blur-[120px] animate-pulse-slow"></div>
-         <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-blue-300/10 dark:bg-blue-900/20 blur-[120px] animate-pulse-slow" style={{animationDelay: '1.5s'}}></div>
+    <div className={bgConfig.className} style={bgConfig.style}>
+      {/* Global Background Overlay */}
+      <div className={bgConfig.overlayClass}></div>
+
+      <div className="relative z-10 flex flex-col min-h-screen">
+        <Header 
+          user={user}
+          onNavigate={setView}
+          onLogout={handleLogout}
+          currentView={view}
+          language={language as LanguageCode || 'en'}
+          setLanguage={(code) => handleSetLanguage(code)}
+        />
+        
+        {/* Translation Loading Overlay */}
+        {isTranslating && (
+          <div className="fixed inset-0 z-50 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm flex items-center justify-center">
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-2xl flex items-center gap-4 border border-slate-200 dark:border-slate-700">
+               <Loader2 size={32} className="text-[#388E3C] animate-spin" />
+               <div>
+                  <h3 className="font-bold text-slate-900 dark:text-white">Translating...</h3>
+                  <p className="text-xs text-slate-500">Optimizing language for your region</p>
+               </div>
+            </div>
+          </div>
+        )}
+
+        <main className="flex-grow flex flex-col relative">
+          {renderRoleBasedInterface()}
+        </main>
+
+        {/* Global WhatsApp Bot FAB */}
+        {user?.role === 'farmer' && (
+          <>
+             <button 
+               onClick={() => setShowWhatsApp(true)}
+               className="fixed bottom-24 md:bottom-8 right-6 z-40 w-14 h-14 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-full shadow-xl shadow-green-200/50 dark:shadow-none flex items-center justify-center transition-transform hover:scale-110"
+               title={t.whatsapp_title}
+             >
+               <MessageCircle size={28} fill="white" />
+             </button>
+             
+             {showWhatsApp && language && (
+                <WhatsAppBot 
+                  t={t} 
+                  languageCode={language} 
+                  userLocation={userLocation} 
+                  onClose={() => setShowWhatsApp(false)} 
+                />
+             )}
+          </>
+        )}
+
+        <Footer t={t} />
+        
+        {isAnalyzing && (
+          <div className="fixed inset-0 z-50 bg-white/90 dark:bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center">
+            <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 max-w-sm w-full text-center">
+              <Leaf className="w-12 h-12 text-[#388E3C] mx-auto mb-4 animate-bounce" />
+              <h3 className="text-2xl font-display font-bold text-slate-900 dark:text-white mb-3">{t.analyzing}</h3>
+              <p className="text-slate-500 dark:text-slate-400 text-sm">{t.analyzing_desc}</p>
+            </div>
+          </div>
+        )}
       </div>
-
-      <Header 
-        user={user}
-        onNavigate={setView}
-        onLogout={handleLogout}
-        currentView={view}
-        language={language as LanguageCode || 'en'}
-        setLanguage={(code) => handleSetLanguage(code)}
-      />
-      
-      {/* Translation Loading Overlay */}
-      {isTranslating && (
-        <div className="fixed inset-0 z-50 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm flex items-center justify-center">
-          <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-2xl flex items-center gap-4 border border-slate-200 dark:border-slate-700">
-             <Loader2 size={32} className="text-agro-600 animate-spin" />
-             <div>
-                <h3 className="font-bold text-slate-900 dark:text-white">Translating...</h3>
-                <p className="text-xs text-slate-500">Optimizing language for your region</p>
-             </div>
-          </div>
-        </div>
-      )}
-
-      <main className="flex-grow flex flex-col relative z-10">
-        {renderRoleBasedInterface()}
-      </main>
-
-      {/* Global WhatsApp Bot FAB */}
-      {user?.role === 'farmer' && (
-        <>
-           <button 
-             onClick={() => setShowWhatsApp(true)}
-             className="fixed bottom-24 md:bottom-8 right-6 z-40 w-14 h-14 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-full shadow-xl shadow-green-200 dark:shadow-none flex items-center justify-center transition-transform hover:scale-110"
-             title={t.whatsapp_title}
-           >
-             <MessageCircle size={28} fill="white" />
-           </button>
-           
-           {showWhatsApp && language && (
-              <WhatsAppBot 
-                t={t} 
-                languageCode={language} 
-                userLocation={userLocation} 
-                onClose={() => setShowWhatsApp(false)} 
-              />
-           )}
-        </>
-      )}
-
-      <Footer t={t} />
-      
-      {isAnalyzing && (
-        <div className="fixed inset-0 z-50 bg-white/90 dark:bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center">
-          <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 max-w-sm w-full text-center">
-            <Leaf className="w-12 h-12 text-agro-600 mx-auto mb-4 animate-bounce" />
-            <h3 className="text-2xl font-display font-bold text-slate-900 dark:text-white mb-3">{t.analyzing}</h3>
-            <p className="text-slate-500 dark:text-slate-400 text-sm">{t.analyzing_desc}</p>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

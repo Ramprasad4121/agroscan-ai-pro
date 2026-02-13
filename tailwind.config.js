@@ -24,6 +24,15 @@ export default {
           800: '#166534',
           900: '#14532d',
           950: '#052e16',
+        },
+        tech: {
+          bg: '#1B2D2E',
+          card: '#243B3D',
+          border: '#2F4F52',
+          cyan: '#4DD0E1',
+          amber: '#FFC107',
+          primary: '#E0F7FA',
+          secondary: '#B2EBF2',
         }
       },
       animation: {

@@ -10,7 +10,7 @@ interface TranslationCache {
 }
 
 const CACHE_KEY = 'agroscan_translation_cache';
-const API_KEY = process.env.API_KEY; 
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY; 
 
 export class TranslationService {
   private static cache: TranslationCache = TranslationService.loadCache();

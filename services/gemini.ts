@@ -2,7 +2,7 @@
 import { GoogleGenAI, Type, Schema, Modality } from "@google/genai";
 import { PlantDiagnosis, GroundingResult, CalendarEvent, CropRecommendation, WaterStressAnalysis, YieldPrediction, FertilizerPlan, PesticideGuidance, StorageAdvice, BuyerProfile, ProfitAnalysis, CostBreakdown, SchemeGuide, PowerSchedule, MarketForecast } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY as string });
 
 // --- UTILITY: Retry Logic for 429 Errors ---
 async function retryWithBackoff<T>(fn: () => Promise<T>, retries = 3, delay = 1000): Promise<T> {
@@ -115,7 +115,7 @@ export const analyzePlantImage = async (
     const text = response.text;
     if (!text) throw new Error("No response from AI");
     
-    return JSON.parse(text) as PlantDiagnosis;
+    return JSON.parse(text || "{}") as PlantDiagnosis;
   });
 };
 
@@ -152,7 +152,7 @@ export const chatWithAgronomist = async (
     });
 
     const result = await chat.sendMessage({ message: newMessage });
-    return result.text;
+    return result.text || "";
   });
 };
 
@@ -185,7 +185,7 @@ export const chatWithSearch = async (
     const result = await chat.sendMessage({ message: newMessage });
     
     return {
-      text: result.text,
+      text: result.text || "",
       groundingMetadata: result.candidates?.[0]?.groundingMetadata
     };
   });
@@ -353,7 +353,7 @@ export const generateCropCalendar = async (crop: string, sowingDate: string, lan
 
     const text = response.text;
     if (!text) throw new Error("No calendar generated");
-    return JSON.parse(text) as CalendarEvent[];
+    return JSON.parse(text || "[]") as CalendarEvent[];
   });
 };
 
@@ -401,7 +401,7 @@ export const recommendCrops = async (lat: number, lng: number, language: string,
 
     const text = response.text;
     if (!text) throw new Error("No recommendations generated");
-    return JSON.parse(text) as CropRecommendation[];
+    return JSON.parse(text || "[]") as CropRecommendation[];
   });
 };
 
@@ -545,7 +545,7 @@ export const analyzeWaterStress = async (
       }
     });
     
-    return JSON.parse(structuredResponse.text) as WaterStressAnalysis;
+    return JSON.parse(structuredResponse.text || "{}") as WaterStressAnalysis;
   });
 };
 
@@ -599,7 +599,7 @@ export const predictYield = async (
       contents: prompt,
       config: { responseMimeType: "application/json", responseSchema: yieldSchema }
     });
-    return JSON.parse(response.text) as YieldPrediction;
+    return JSON.parse(response.text || "{}") as YieldPrediction;
   });
 };
 
@@ -643,7 +643,7 @@ export const calculateFertilizer = async (
       contents: prompt,
       config: { responseMimeType: "application/json", responseSchema: fertilizerSchema }
     });
-    return JSON.parse(response.text) as FertilizerPlan;
+    return JSON.parse(response.text || "{}") as FertilizerPlan;
   });
 };
 
@@ -681,7 +681,7 @@ export const getPesticideSafety = async (
       contents: prompt,
       config: { responseMimeType: "application/json", responseSchema: pesticideSchema }
     });
-    return JSON.parse(response.text) as PesticideGuidance;
+    return JSON.parse(response.text || "{}") as PesticideGuidance;
   });
 };
 
@@ -743,7 +743,7 @@ export const getStorageAdvice = async (
       config: { responseMimeType: "application/json", responseSchema: storageSchema }
     });
     
-    return JSON.parse(response.text) as StorageAdvice;
+    return JSON.parse(response.text || "{}") as StorageAdvice;
   });
 };
 
@@ -801,7 +801,7 @@ export const findPotentialBuyers = async (
       config: { responseMimeType: "application/json", responseSchema: buyerSchema }
     });
     
-    return JSON.parse(response.text) as BuyerProfile[];
+    return JSON.parse(response.text || "[]") as BuyerProfile[];
   });
 };
 
@@ -872,7 +872,7 @@ export const calculateProfitability = async (
       config: { responseMimeType: "application/json", responseSchema: profitSchema }
     });
     
-    return JSON.parse(response.text) as ProfitAnalysis;
+    return JSON.parse(response.text || "{}") as ProfitAnalysis;
   });
 };
 
@@ -922,7 +922,7 @@ export const generateSchemeGuide = async (
       config: { responseMimeType: "application/json", responseSchema: guideSchema }
     });
     
-    return JSON.parse(response.text) as SchemeGuide;
+    return JSON.parse(response.text || "{}") as SchemeGuide;
   });
 };
 
@@ -990,7 +990,7 @@ export const getPowerSchedule = async (
       config: { responseMimeType: "application/json", responseSchema: powerSchema }
     });
     
-    return JSON.parse(response.text) as PowerSchedule;
+    return JSON.parse(response.text || "{}") as PowerSchedule;
   });
 };
 
@@ -1072,6 +1072,6 @@ export const generateMarketForecast = async (
       config: { responseMimeType: "application/json", responseSchema: forecastSchema }
     });
     
-    return JSON.parse(response.text) as MarketForecast;
+    return JSON.parse(response.text || "{}") as MarketForecast;
   });
 };

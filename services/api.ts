@@ -4,17 +4,17 @@ import { offlineService } from './offline';
 
 // --- API ARCHITECTURE & KEY MAPPING ---
 export const API_CONFIG = {
-  gemini: process.env.GEMINI_API_KEY,
-  vision: process.env.VISION_API_KEY,
-  diseaseModel: process.env.DISEASE_MODEL_KEY,
-  satellite: process.env.SATELLITE_API_KEY,
-  weather: process.env.WEATHER_API_KEY,
-  maps: process.env.MAPS_API_KEY,
-  sms: process.env.SMS_API_KEY,
-  whatsapp: process.env.WHATSAPP_API_KEY,
-  payment: process.env.PAYMENT_GATEWAY_KEY,
-  kyc: process.env.KYC_PROVIDER_KEY,
-  analytics: process.env.ANALYTICS_KEY,
+  gemini: import.meta.env.VITE_GEMINI_API_KEY,
+  vision: import.meta.env.VITE_VISION_API_KEY,
+  diseaseModel: import.meta.env.VITE_DISEASE_MODEL_KEY,
+  satellite: import.meta.env.VITE_SATELLITE_API_KEY,
+  weather: import.meta.env.VITE_WEATHER_API_KEY,
+  maps: import.meta.env.VITE_MAPS_API_KEY,
+  sms: import.meta.env.VITE_SMS_API_KEY,
+  whatsapp: import.meta.env.VITE_WHATSAPP_API_KEY,
+  payment: import.meta.env.VITE_PAYMENT_GATEWAY_KEY,
+  kyc: import.meta.env.VITE_KYC_PROVIDER_KEY,
+  analytics: import.meta.env.VITE_ANALYTICS_KEY,
 };
 
 const NETWORK_DELAY = 1000;

@@ -72,7 +72,7 @@ Follow these steps to set up the project locally.
 ### Prerequisites
 *   **Node.js** (v16 or higher)
 *   **npm** or **yarn**
-*   A **Google Gemini API Key** (Get one [here](https://aistudio.google.com/app/apikey))
+
 
 ### Installation
 
@@ -86,43 +86,44 @@ Follow these steps to set up the project locally.
     ```bash
     npm install
     ```
-
-3.  **Environment Setup**
-    Create a `.env` file in the root directory and add your API Key:
-    ```env
-    VITE_GEMINI_API_KEY=your_actual_api_key_here
-    ```
-    *(Note: Ensure your code uses the correct env variable name. The project currently may use a direct integration or proxy.)*
-
-4.  **Run Development Server**
+3.  **Run Development Server**
     ```bash
     npm run dev
     ```
     Open [http://localhost:5173](http://localhost:5173) to view it in the browser.
 
----
 
-## 🧠 AI Integration Details
-
-AgroScan AI Pro uses the **Gemini 1.5 Flash** model for its speed and multimodal capabilities.
-
-*   **Image Analysis:** The `Scanner` component compresses user images effectively for low bandwidth (reducing 5MB -> ~200KB) before sending them to Gemini for analysis.
-*   **Prompt Engineering:** We use specialized system prompts (located in `services/gemini.ts` implied) to enforce structured JSON outputs for diagnosis, ensuring reliability in the UI.
-*   **Multilingual:** The AI is prompted to respond in the user's selected language, breaking literacy barriers.
 
 ---
 
-## 📱 Screenshots
+## 🏗️ Architecture
 
-| **Plant Diagnosis** | **Market Insights** |
-|:---:|:---:|
-| <img src="https://via.placeholder.com/300x600?text=Diagnosis+Screen" alt="Diagnosis" width="200"/> | <img src="https://via.placeholder.com/300x600?text=Market+Screen" alt="Market" width="200"/> |
+AgroScan AI Pro follows a modern, client-side first architecture designed for performance and offline reliability, powered by Google's Gemini 1.5 Flash model.
 
-| **Voice Assistant** | **Dashboard** |
-|:---:|:---:|
-| <img src="https://via.placeholder.com/300x600?text=Voice+Assistant" alt="Voice" width="200"/> | <img src="https://via.placeholder.com/300x600?text=Dashboard" alt="Dashboard" width="200"/> |
-
-*(Replace these placeholders with actual screenshots of your app)*
+```mermaid
+graph TD
+    User[👨‍🌾 User] -->|Interacts| UI[📱 Frontend (React + Vite)]
+    
+    subgraph "Application Layer"
+        UI -->|State| Context[⚛️ React Context]
+        UI -->|Routing| Router[🛣️ React Router]
+    end
+    
+    subgraph "Service Layer"
+        UI -->|AI Request| Gemini[🧠 Gemini Service]
+        UI -->|Data| MockAPI[🌐 Mock API Service]
+        UI -->|Lang| Translation[🗣️ Translation Service]
+    end
+    
+    subgraph "External"
+        Gemini <-->|Multimodal| Google[☁️ Google Gemini API]
+    end
+    
+    subgraph "Storage"
+        UI <-->|Cache| Local[💾 LocalStorage]
+        Local <-->|Sync| Offline[🔄 Offline Manager]
+    end
+```
 
 ---
 
@@ -136,11 +137,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 4.  Push to the Branch (`git push origin feature/AmazingFeature`)
 5.  Open a Pull Request
 
----
-
-## 📄 License
-
-Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
 

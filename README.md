@@ -94,36 +94,7 @@ Follow these steps to set up the project locally.
 
 
 
----
 
-## 🏗️ Architecture
-
-AgroScan AI Pro follows a modern, client-side first architecture designed for performance and offline reliability, powered by Google's Gemini 1.5 Flash model.
-
-```mermaid
-graph TD
-    User[👨‍🌾 User] -->|Interacts| UI[📱 Frontend (React + Vite)]
-    
-    subgraph "Application Layer"
-        UI -->|State| Context[⚛️ React Context]
-        UI -->|Routing| Router[🛣️ React Router]
-    end
-    
-    subgraph "Service Layer"
-        UI -->|AI Request| Gemini[🧠 Gemini Service]
-        UI -->|Data| MockAPI[🌐 Mock API Service]
-        UI -->|Lang| Translation[🗣️ Translation Service]
-    end
-    
-    subgraph "External"
-        Gemini <-->|Multimodal| Google[☁️ Google Gemini API]
-    end
-    
-    subgraph "Storage"
-        UI <-->|Cache| Local[💾 LocalStorage]
-        Local <-->|Sync| Offline[🔄 Offline Manager]
-    end
-```
 
 ---
 

@@ -28,6 +28,12 @@ export const Login: React.FC<LoginProps> = ({ onLogin, t }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!role) return;
+    if (mode === 'signup' && (!consent.terms || !consent.data)) {
+      setAuthError(
+        t?.consent_required || "Please accept both the terms and the data-sharing consent to continue."
+      );
+      return;
+    }
     setLoading(true);
     setAuthError(null);
     try {
@@ -161,6 +167,46 @@ export const Login: React.FC<LoginProps> = ({ onLogin, t }) => {
                            <input type="password" value={password} onChange={e => setPassword(e.target.value)} className="bg-transparent outline-none w-full text-sm font-bold" placeholder="••••••" />
                         </div>
                      </div>
+
+                     {mode === 'signup' && (
+                        <div className="space-y-2 mt-4">
+                           {([
+                              ['terms', t?.consent_terms || "I agree to the Terms of Service."],
+                              ['data', t?.consent_data || "I consent to my farm data being used for AI diagnosis."],
+                           ] as const).map(([key, label]) => (
+                              <label
+                                 key={key}
+                                 className="flex items-start gap-2.5 cursor-pointer group select-none"
+                              >
+                                 <button
+                                    type="button"
+                                    role="checkbox"
+                                    aria-checked={consent[key]}
+                                    onClick={() => setConsent(c => ({ ...c, [key]: !c[key] }))}
+                                    className={`mt-0.5 w-4 h-4 rounded border flex items-center justify-center transition-all shrink-0 ${
+                                       consent[key]
+                                          ? 'bg-tech-cyan border-tech-cyan'
+                                          : 'bg-tech-bg border-tech-border group-hover:border-tech-cyan/60'
+                                    }`}
+                                 >
+                                    {consent[key] && <Check size={12} className="text-tech-bg" />}
+                                 </button>
+                                 <input
+                                    type="checkbox"
+                                    className="sr-only"
+                                    checked={consent[key]}
+                                    tabIndex={-1}
+                                    readOnly
+                                 />
+                                 <span className={`text-xs leading-relaxed transition-colors ${
+                                       consent[key] ? 'text-tech-primary' : 'text-tech-secondary'
+                                 }`}>
+                                    {label}
+                                 </span>
+                              </label>
+                           ))}
+                        </div>
+                     )}
 
                      <div className="flex gap-4 mt-4">
                         <button type="submit" disabled={loading} className="flex-1 btn-primary py-3.5 rounded-lg flex items-center justify-center gap-2">

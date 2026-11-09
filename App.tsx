@@ -37,9 +37,29 @@ import { Leaf, Share2, MessageCircle, Loader2 } from 'lucide-react';
 import { LanguageCode } from './translations';
 import { useTranslation } from './hooks/useTranslation';
 
+const SESSION_KEY = 'agroscan_user';
+
+const readSession = (): User | null => {
+  try {
+    const saved = localStorage.getItem(SESSION_KEY);
+    if (!saved) return null;
+    const parsed = JSON.parse(saved);
+    return parsed && typeof parsed === 'object' && parsed.role ? (parsed as User) : null;
+  } catch {
+    return null;
+  }
+};
+
 const App: React.FC = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [view, setView] = useState<ViewState>('login');
+  // Restore a persisted session (mock auth keeps working across reloads)
+  const [user, setUser] = useState<User | null>(() => {
+    if (typeof window === 'undefined') return null;
+    return readSession();
+  });
+  const [view, setView] = useState<ViewState>(() => {
+    if (typeof window === 'undefined') return 'login';
+    return readSession() ? 'home' : 'login';
+  });
   const [currentImage, setCurrentImage] = useState<string | null>(null);
   const [diagnosis, setDiagnosis] = useState<PlantDiagnosis | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -90,7 +110,12 @@ const App: React.FC = () => {
   const handleLogin = (userData: User) => {
     setUser(userData);
     setView('home');
-    
+    try {
+      localStorage.setItem(SESSION_KEY, JSON.stringify(userData));
+    } catch {
+      // storage full/unavailable: session just won't persist across reloads
+    }
+
     if (userData.role === 'farmer') {
       const hasSeenTour = localStorage.getItem('hasSeenTour');
       if (!hasSeenTour) {
@@ -110,7 +135,12 @@ const App: React.FC = () => {
     setDiagnosis(null);
     setCurrentImage(null);
     setLanguage(null);
-    localStorage.removeItem('app_language');
+    try {
+      localStorage.removeItem(SESSION_KEY);
+      localStorage.removeItem('app_language');
+    } catch {
+      // ignore storage errors on logout
+    }
     document.documentElement.classList.add('dark'); // Reset to default dark
   };
 

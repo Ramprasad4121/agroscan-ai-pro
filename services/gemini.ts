@@ -150,7 +150,7 @@ export const chatWithAgronomist = async (
     `;
 
     const chat = getAI().chats.create({
-      model: 'gemini-3-pro-preview',
+      model: 'gemini-2.5-pro',
       config: {
         systemInstruction: `You are an expert agronomist assistant helping a farmer who just scanned a plant. 
         Use the provided context to answer follow-up questions. 
@@ -206,10 +206,14 @@ export const chatWithSearch = async (
 };
 
 // 2. Image Generation
-export const generateGardenImage = async (prompt: string, aspectRatio: string): Promise<string> => {
-  return retryWithBackoff(async () => {
+// Uses inline image generation (gemini-*-image models, free-tier eligible).
+// imagen-* endpoints require a paid/billed key, so they are fallback-only.
+const IMAGE_MODELS = ['gemini-2.5-flash-image', 'gemini-3.1-flash-image', 'imagen-4.0-generate-001'];
+
+const generateImageWithModel = async (model: string, prompt: string, aspectRatio: string): Promise<string> => {
+  if (model.startsWith('imagen')) {
     const response = await getAI().models.generateImages({
-      model: 'imagen-4.0-generate-001',
+      model,
       prompt: prompt,
       config: {
         numberOfImages: 1,
@@ -217,12 +221,40 @@ export const generateGardenImage = async (prompt: string, aspectRatio: string): 
         aspectRatio: aspectRatio,
       },
     });
-
     const base64ImageBytes = response.generatedImages?.[0]?.image?.imageBytes;
     if (!base64ImageBytes) throw new Error("Failed to generate image");
-    
     return `data:image/jpeg;base64,${base64ImageBytes}`;
+  }
+
+  // Inline image generation via generateContent
+  const response = await getAI().models.generateContent({
+    model,
+    contents: { parts: [{ text: prompt }] },
+    config: {
+      responseModalities: [Modality.IMAGE, Modality.TEXT],
+      imageConfig: { aspectRatio },
+    },
   });
+  const inlinePart = response.candidates?.[0]?.content?.parts?.find(p => p.inlineData?.mimeType?.startsWith('image/'));
+  const data = inlinePart?.inlineData?.data;
+  if (!data) throw new Error("Failed to generate image (no image part in response)");
+  return `data:${inlinePart.inlineData!.mimeType};base64,${data}`;
+};
+
+export const generateGardenImage = async (prompt: string, aspectRatio: string): Promise<string> => {
+  let lastError: any = null;
+  for (const model of IMAGE_MODELS) {
+    try {
+      return await generateImageWithModel(model, prompt, aspectRatio);
+    } catch (e: any) {
+      lastError = e;
+      console.warn(`Image model ${model} failed: ${e instanceof Error ? e.message : e}`);
+    }
+  }
+  if (lastError instanceof Error && /429|RESOURCE_EXHAUSTED/i.test(lastError.message)) {
+    throw new Error("Image generation quota exhausted. Please try again in a minute.");
+  }
+  throw new Error("Failed to generate image with any available model.");
 };
 
 // 3. Search Grounding
@@ -291,11 +323,11 @@ export const speakText = async (text: string, language: string = 'English'): Pro
   });
 };
 
-// 6. Video Analysis (Gemini 3 Pro)
+// 6. Video Analysis (Gemini 2.5 Pro — multimodal video understanding)
 export const analyzeVideo = async (base64Data: string, mimeType: string, prompt: string): Promise<string> => {
   return retryWithBackoff(async () => {
     const response = await getAI().models.generateContent({
-      model: 'gemini-3-pro-preview',
+      model: 'gemini-2.5-pro',
       contents: {
         parts: [
           {

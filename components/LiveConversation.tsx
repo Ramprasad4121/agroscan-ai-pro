@@ -1,8 +1,9 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Mic, MicOff, Activity, Radio, Volume2, Globe, Languages } from 'lucide-react';
-import { GoogleGenAI, LiveServerMessage, Modality, Blob } from '@google/genai';
+import { Mic, MicOff, Activity, Radio, Volume2, Globe, Languages, AlertTriangle } from 'lucide-react';
+import { LiveServerMessage, Modality, Blob } from '@google/genai';
 import { getLanguageName } from '../translations';
+import { getAI } from '../services/gemini';
 
 interface LiveConversationProps {
   t: any;
@@ -14,6 +15,7 @@ export const LiveConversation: React.FC<LiveConversationProps> = ({ t, languageC
   const [isSpeaking, setIsSpeaking] = useState(false); // Model is speaking
   const [isListening, setIsListening] = useState(false); // User is speaking/mic active
   const [volume, setVolume] = useState(0);
+  const [error, setError] = useState<string | null>(null);
   
   const audioContextRef = useRef<AudioContext | null>(null);
   const inputContextRef = useRef<AudioContext | null>(null);
@@ -23,8 +25,6 @@ export const LiveConversation: React.FC<LiveConversationProps> = ({ t, languageC
   const streamRef = useRef<MediaStream | null>(null);
   const processorRef = useRef<ScriptProcessorNode | null>(null);
   
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
   useEffect(() => {
     // Cleanup on unmount
     return () => {
@@ -41,6 +41,14 @@ export const LiveConversation: React.FC<LiveConversationProps> = ({ t, languageC
   }, [languageCode]);
 
   const connect = async () => {
+    setError(null);
+    let ai;
+    try {
+      ai = getAI();
+    } catch (e) {
+      setError((e instanceof Error && e.message) || "Gemini API key is not configured.");
+      return;
+    }
     try {
       // 1. Setup Input Audio (16kHz)
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -153,7 +161,10 @@ export const LiveConversation: React.FC<LiveConversationProps> = ({ t, languageC
 
     } catch (error) {
       console.error("Failed to connect:", error);
-      alert("Could not access microphone or connect to API.");
+      setIsConnected(false);
+      setError(
+        `Could not access microphone or connect to the voice service. ${(error instanceof Error ? error.message : "")}`.trim()
+      );
     }
   };
 
@@ -255,6 +266,16 @@ export const LiveConversation: React.FC<LiveConversationProps> = ({ t, languageC
           {t.live_desc}
         </p>
       </div>
+
+      {error && (
+        <div className="mb-8 z-10 max-w-md w-full bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 rounded-xl p-4 flex items-start gap-3 animate-fade-in">
+           <AlertTriangle size={20} className="text-red-500 shrink-0 mt-0.5" />
+           <div className="text-left">
+              <h4 className="text-sm font-bold text-red-600 dark:text-red-400 uppercase tracking-wide mb-1">Connection Issue</h4>
+              <p className="text-xs text-red-500 dark:text-red-300 leading-relaxed">{error}</p>
+           </div>
+        </div>
+      )}
 
       {/* Main Visualizer Interface */}
       <div className="relative mb-12 z-10">

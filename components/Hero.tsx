@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Camera, Mic, Video, Droplets, Calendar, Calculator, Shield, Warehouse, Globe, Store, PieChart, Zap, Users, FileText, Plane, Leaf, ArrowRight, TrendingUp, CloudSun, Landmark, Sprout } from 'lucide-react';
+import { Camera, Mic, Video, Droplets, Calendar, Calculator, Shield, Warehouse, Globe, Store, PieChart, Zap, Users, FileText, Plane, Leaf, ArrowRight, TrendingUp, CloudSun, Landmark, Sprout, ImagePlus } from 'lucide-react';
 import { ViewState } from '../types';
 import { WeatherWidget, MandiTicker } from './DashboardWidgets';
 
@@ -25,6 +25,13 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, t, userLocation, userNam
     { id: 'market', title: t.market_title, icon: Globe, path: 'market' },
     { id: 'profit', title: t.profit_title, icon: PieChart, path: 'profit' },
     { id: 'electricity', title: t.power_title, icon: Zap, path: 'electricity' },
+    { id: 'visualize', title: t.gen_title || "Farm Visualizer", icon: ImagePlus, path: 'visualize' },
+    { id: 'video', title: t.video_title || "Video Scan", icon: Video, path: 'video' },
+    { id: 'audio', title: t.audio_title || "Voice Notes", icon: Mic, path: 'audio' },
+    { id: 'storage', title: t.storage_title || "Storage Guide", icon: Warehouse, path: 'storage' },
+    { id: 'marketplace', title: t.market_place_title || "Direct Marketplace", icon: Store, path: 'marketplace' },
+    { id: 'community', title: t.community_title || "Farmer Community", icon: Users, path: 'community' },
+    { id: 'drones', title: t.drone_title || "Drone Services", icon: Plane, path: 'drones' },
   ];
 
   const formattedDate = new Date().toDateString().replace(/(\w{3}) (\w{3}) (\d{2}) (\d{4})/, "$1 $2 $3 $4");

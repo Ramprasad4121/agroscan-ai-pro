@@ -2,7 +2,21 @@
 import { GoogleGenAI, Type, Schema, Modality } from "@google/genai";
 import { PlantDiagnosis, GroundingResult, CalendarEvent, CropRecommendation, WaterStressAnalysis, YieldPrediction, FertilizerPlan, PesticideGuidance, StorageAdvice, BuyerProfile, ProfitAnalysis, CostBreakdown, SchemeGuide, PowerSchedule, MarketForecast } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY as string });
+let _ai: GoogleGenAI | null = null;
+
+// Lazy-initialize the Gemini client so a missing API key does not crash the app at boot.
+export const getAI = (): GoogleGenAI => {
+  if (!_ai) {
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY as string | undefined;
+    if (!apiKey) {
+      throw new Error(
+        "Gemini API key is missing. Set VITE_GEMINI_API_KEY in your .env file and restart the dev server."
+      );
+    }
+    _ai = new GoogleGenAI({ apiKey });
+  }
+  return _ai;
+};
 
 // --- UTILITY: Retry Logic for 429 Errors ---
 async function retryWithBackoff<T>(fn: () => Promise<T>, retries = 3, delay = 1000): Promise<T> {
@@ -86,7 +100,7 @@ export const analyzePlantImage = async (
          - Be encouraging and respectful.` 
       : `Act as an expert agronomist. Identify the plant. Detect any diseases, pests, OR nutrient deficiencies (N-P-K, Micronutrients). ${locationContext}`;
 
-    const response = await ai.models.generateContent({
+    const response = await getAI().models.generateContent({
       model: modelId,
       contents: {
         parts: [
@@ -135,7 +149,7 @@ export const chatWithAgronomist = async (
       Symptoms: ${context.symptoms.join(', ')}
     `;
 
-    const chat = ai.chats.create({
+    const chat = getAI().chats.create({
       model: 'gemini-3-pro-preview',
       config: {
         systemInstruction: `You are an expert agronomist assistant helping a farmer who just scanned a plant. 
@@ -166,7 +180,7 @@ export const chatWithSearch = async (
 ) => {
   return retryWithBackoff(async () => {
     // gemini-2.5-flash with googleSearch
-    const chat = ai.chats.create({
+    const chat = getAI().chats.create({
       model: 'gemini-2.5-flash',
       config: {
         tools: [{ googleSearch: {} }],
@@ -194,7 +208,7 @@ export const chatWithSearch = async (
 // 2. Image Generation
 export const generateGardenImage = async (prompt: string, aspectRatio: string): Promise<string> => {
   return retryWithBackoff(async () => {
-    const response = await ai.models.generateImages({
+    const response = await getAI().models.generateImages({
       model: 'imagen-4.0-generate-001',
       prompt: prompt,
       config: {
@@ -214,7 +228,7 @@ export const generateGardenImage = async (prompt: string, aspectRatio: string): 
 // 3. Search Grounding
 export const searchAgriculturalData = async (query: string): Promise<GroundingResult> => {
   return retryWithBackoff(async () => {
-    const response = await ai.models.generateContent({
+    const response = await getAI().models.generateContent({
       model: "gemini-2.5-flash",
       contents: query,
       config: {
@@ -232,7 +246,7 @@ export const searchAgriculturalData = async (query: string): Promise<GroundingRe
 // 4. Maps Grounding
 export const findNearbyResources = async (query: string, lat: number, lng: number): Promise<GroundingResult> => {
   return retryWithBackoff(async () => {
-    const response = await ai.models.generateContent({
+    const response = await getAI().models.generateContent({
       model: "gemini-2.5-flash",
       contents: query,
       config: {
@@ -258,7 +272,7 @@ export const findNearbyResources = async (query: string, lat: number, lng: numbe
 // 5. TTS
 export const speakText = async (text: string, language: string = 'English'): Promise<string> => {
   return retryWithBackoff(async () => {
-    const response = await ai.models.generateContent({
+    const response = await getAI().models.generateContent({
       model: "gemini-2.5-flash-preview-tts",
       contents: [{ parts: [{ text }] }],
       config: {
@@ -280,7 +294,7 @@ export const speakText = async (text: string, language: string = 'English'): Pro
 // 6. Video Analysis (Gemini 3 Pro)
 export const analyzeVideo = async (base64Data: string, mimeType: string, prompt: string): Promise<string> => {
   return retryWithBackoff(async () => {
-    const response = await ai.models.generateContent({
+    const response = await getAI().models.generateContent({
       model: 'gemini-3-pro-preview',
       contents: {
         parts: [
@@ -301,7 +315,7 @@ export const analyzeVideo = async (base64Data: string, mimeType: string, prompt:
 // 7. Audio Transcription (Gemini 2.5 Flash)
 export const transcribeAudio = async (base64Data: string, mimeType: string = 'audio/wav', languageName: string = 'English'): Promise<string> => {
   return retryWithBackoff(async () => {
-    const response = await ai.models.generateContent({
+    const response = await getAI().models.generateContent({
       model: 'gemini-2.5-flash',
       contents: {
         parts: [
@@ -341,7 +355,7 @@ export const generateCropCalendar = async (crop: string, sowingDate: string, lan
     Assume standard Indian farming conditions unless specified.
     Return the content in the ${language} language.`;
 
-    const response = await ai.models.generateContent({
+    const response = await getAI().models.generateContent({
       model: "gemini-2.5-flash",
       contents: prompt,
       config: {
@@ -389,7 +403,7 @@ export const recommendCrops = async (lat: number, lng: number, language: string,
     Consider the local climate, soil type (implied by region), and water availability.
     Provide the output in ${language}.`;
 
-    const response = await ai.models.generateContent({
+    const response = await getAI().models.generateContent({
       model: "gemini-2.5-flash",
       contents: prompt,
       config: {
@@ -414,7 +428,7 @@ export const generateFinancialTip = async (topic: string, language: string): Pro
     Focus on practical application in a rural context.
     Respond in ${language}.`;
 
-    const response = await ai.models.generateContent({
+    const response = await getAI().models.generateContent({
       model: "gemini-2.5-flash",
       contents: prompt,
       config: {
@@ -435,7 +449,7 @@ export const fetchMarketNews = async (language: string, location: { lat: number;
     Focus on recent events (last 7 days).
     Respond in ${language}.`;
 
-    const response = await ai.models.generateContent({
+    const response = await getAI().models.generateContent({
       model: "gemini-2.5-flash",
       contents: prompt,
       config: {
@@ -468,7 +482,7 @@ export const getDiagnosisAssistance = async (
     
     Respond in ${language}.`;
 
-    const response = await ai.models.generateContent({
+    const response = await getAI().models.generateContent({
       model: "gemini-2.5-flash",
       contents: prompt,
       config: {
@@ -518,7 +532,7 @@ export const analyzeWaterStress = async (
     Calculate approximate Evapotranspiration (ET) based on temperature.
     Estimate irrigation needs for standard regional crops (like Wheat/Rice).`;
     
-    const searchResponse = await ai.models.generateContent({
+    const searchResponse = await getAI().models.generateContent({
       model: "gemini-2.5-flash",
       contents: searchPrompt,
       config: {
@@ -536,7 +550,7 @@ export const analyzeWaterStress = async (
     Return JSON matching the schema. 
     Translate fields to ${language} where appropriate.`;
 
-    const structuredResponse = await ai.models.generateContent({
+    const structuredResponse = await getAI().models.generateContent({
       model: "gemini-2.5-flash",
       contents: processPrompt,
       config: {
@@ -575,7 +589,7 @@ export const predictYield = async (
     Research weather forecast for Latitude ${lat}, Longitude ${lng} for the rest of the growing season.
     Research average cost of cultivation for ${crop} in India per acre.`;
     
-    const searchRes = await ai.models.generateContent({
+    const searchRes = await getAI().models.generateContent({
       model: "gemini-2.5-flash",
       contents: searchPrompt,
       config: { tools: [{ googleSearch: {} }] }
@@ -594,7 +608,7 @@ export const predictYield = async (
     
     Return JSON. Translate to ${language}.`;
 
-    const response = await ai.models.generateContent({
+    const response = await getAI().models.generateContent({
       model: "gemini-2.5-flash",
       contents: prompt,
       config: { responseMimeType: "application/json", responseSchema: yieldSchema }
@@ -638,7 +652,7 @@ export const calculateFertilizer = async (
     Provide Cost Optimization tips and Organic alternatives (FYM, Bio-fertilizers).
     Return JSON. Translate to ${language}.`;
 
-    const response = await ai.models.generateContent({
+    const response = await getAI().models.generateContent({
       model: "gemini-2.5-flash",
       contents: prompt,
       config: { responseMimeType: "application/json", responseSchema: fertilizerSchema }
@@ -676,7 +690,7 @@ export const getPesticideSafety = async (
     
     Return JSON. Translate to ${language}.`;
 
-    const response = await ai.models.generateContent({
+    const response = await getAI().models.generateContent({
       model: "gemini-2.5-flash",
       contents: prompt,
       config: { responseMimeType: "application/json", responseSchema: pesticideSchema }
@@ -722,7 +736,7 @@ export const getStorageAdvice = async (
     const searchPrompt = `Research current market price trends and supply forecasts for '${crop}' ${locationStr}.
     Find optimal storage conditions (Temperature, Humidity, Moisture content) for '${crop}' to prevent spoilage.`;
     
-    const searchRes = await ai.models.generateContent({
+    const searchRes = await getAI().models.generateContent({
       model: "gemini-2.5-flash",
       contents: searchPrompt,
       config: { tools: [{ googleSearch: {} }] }
@@ -737,7 +751,7 @@ export const getStorageAdvice = async (
     
     Return JSON. Translate to ${language}.`;
 
-    const response = await ai.models.generateContent({
+    const response = await getAI().models.generateContent({
       model: "gemini-2.5-flash",
       contents: prompt,
       config: { responseMimeType: "application/json", responseSchema: storageSchema }
@@ -778,7 +792,7 @@ export const findPotentialBuyers = async (
     const searchPrompt = `Find contact details of active Farmer Producer Organizations (FPOs), Mandi Traders, Food Processing Units, or Wholesale buyers for '${crop}' ${locationStr}.
     Also find current market price for '${crop}' to estimate offers.`;
     
-    const searchRes = await ai.models.generateContent({
+    const searchRes = await getAI().models.generateContent({
       model: "gemini-2.5-flash",
       contents: searchPrompt,
       config: { tools: [{ googleSearch: {} }] }
@@ -795,7 +809,7 @@ export const findPotentialBuyers = async (
     
     Return JSON. Translate descriptions to ${language}.`;
 
-    const response = await ai.models.generateContent({
+    const response = await getAI().models.generateContent({
       model: "gemini-2.5-flash",
       contents: prompt,
       config: { responseMimeType: "application/json", responseSchema: buyerSchema }
@@ -833,7 +847,7 @@ export const calculateProfitability = async (
     
     // 1. Get Market Data & Yield Benchmarks
     const searchPrompt = `Current Mandi market price for '${crop}' ${locationStr}. Average yield per acre for '${crop}' in this region.`;
-    const searchRes = await ai.models.generateContent({
+    const searchRes = await getAI().models.generateContent({
       model: "gemini-2.5-flash",
       contents: searchPrompt,
       config: { tools: [{ googleSearch: {} }] }
@@ -866,7 +880,7 @@ export const calculateProfitability = async (
     
     Return JSON in ${language}.`;
 
-    const response = await ai.models.generateContent({
+    const response = await getAI().models.generateContent({
       model: "gemini-2.5-flash",
       contents: prompt,
       config: { responseMimeType: "application/json", responseSchema: profitSchema }
@@ -916,7 +930,7 @@ export const generateSchemeGuide = async (
     Focus on removing frustration. Be practical.
     Respond in ${language}.`;
 
-    const response = await ai.models.generateContent({
+    const response = await getAI().models.generateContent({
       model: "gemini-2.5-flash",
       contents: prompt,
       config: { responseMimeType: "application/json", responseSchema: guideSchema }
@@ -965,7 +979,7 @@ export const getPowerSchedule = async (
     Check if there is a day/night rotation (e.g. Week A Day, Week B Night).
     Estimate the schedule for TODAY based on the current week/date.`;
     
-    const searchRes = await ai.models.generateContent({
+    const searchRes = await getAI().models.generateContent({
       model: "gemini-2.5-flash",
       contents: searchPrompt,
       config: { tools: [{ googleSearch: {} }] }
@@ -984,7 +998,7 @@ export const getPowerSchedule = async (
     
     Return JSON in ${language}.`;
 
-    const response = await ai.models.generateContent({
+    const response = await getAI().models.generateContent({
       model: "gemini-2.5-flash",
       contents: prompt,
       config: { responseMimeType: "application/json", responseSchema: powerSchema }
@@ -1046,7 +1060,7 @@ export const generateMarketForecast = async (
     3. Export policies or government bans on ${crop}.
     4. Price trends for ${crop} over last month.`;
     
-    const searchRes = await ai.models.generateContent({
+    const searchRes = await getAI().models.generateContent({
       model: "gemini-2.5-flash",
       contents: searchPrompt,
       config: { tools: [{ googleSearch: {} }] }
@@ -1066,7 +1080,7 @@ export const generateMarketForecast = async (
     
     Return JSON in ${language}.`;
 
-    const response = await ai.models.generateContent({
+    const response = await getAI().models.generateContent({
       model: "gemini-2.5-flash",
       contents: prompt,
       config: { responseMimeType: "application/json", responseSchema: forecastSchema }

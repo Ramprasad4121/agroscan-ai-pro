@@ -1,4 +1,19 @@
 
+/**
+ * Removes light markdown markers so model answers render cleanly as plain
+ * text inside chat bubbles (the UI does not render markdown).
+ */
+export const stripMarkdown = (text: string): string =>
+  text
+    .replace(/```[a-z]*\n?/gi, '')
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
+    .replace(/__([^_]+)__/g, '$1')
+    .replace(/(^|\s)\*([^*\n]+)\*/g, '$1$2')
+    .replace(/^#{1,6}\s*/gm, '')
+    .replace(/^\s*[-*+]\s+/gm, '• ')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+
 // --- Storage keys (single source of truth) ---
 export const STORAGE_KEYS = {
   session: 'agro_ai_user',

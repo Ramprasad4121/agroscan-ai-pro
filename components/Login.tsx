@@ -6,10 +6,11 @@ import { authService } from '../services/api';
 
 interface LoginProps {
   onLogin: (user: User) => void;
+  onBack?: () => void;
   t: any;
 }
 
-export const Login: React.FC<LoginProps> = ({ onLogin, t }) => {
+export const Login: React.FC<LoginProps> = ({ onLogin, onBack, t }) => {
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [role, setRole] = useState<UserRole | null>(null);
   const [loading, setLoading] = useState(false);
@@ -79,20 +80,22 @@ export const Login: React.FC<LoginProps> = ({ onLogin, t }) => {
                    AGRO <span className="text-tech-cyan">AI</span>
                 </h1>
                 <p className="text-xl text-tech-secondary max-w-md leading-relaxed font-light">
-                   Advanced Agricultural Intelligence Platform. 
-                   Connecting fields to the future.
+                   {t.landing_headline || "Everything a Farmer Needs. One Conversation Away."}
+                </p>
+                <p className="text-sm text-tech-secondary/80 max-w-md leading-relaxed mt-3">
+                   {t.landing_just_ask || "No navigating multiple websites. Just ask."}
                 </p>
              </div>
              <div className="grid grid-cols-2 gap-4 pt-8">
                 <div className="bg-tech-card p-4 rounded-lg border border-tech-border">
                    <Server className="text-tech-amber mb-2" />
-                   <h4 className="font-bold text-tech-primary text-sm uppercase">Real-time Data</h4>
-                   <p className="text-xs text-tech-secondary mt-1">Live mandi rates & satellite feeds</p>
+                   <h4 className="font-bold text-tech-primary text-sm uppercase">{t.landing_pillar_markets}</h4>
+                   <p className="text-xs text-tech-secondary mt-1">{t.landing_real_time_data || "Live mandi rates & satellite feeds"}</p>
                 </div>
                 <div className="bg-tech-card p-4 rounded-lg border border-tech-border">
                    <Shield className="text-tech-cyan mb-2" />
-                   <h4 className="font-bold text-tech-primary text-sm uppercase">Secure Identity</h4>
-                   <p className="text-xs text-tech-secondary mt-1">Blockchain-ready consent ledger</p>
+                   <h4 className="font-bold text-tech-primary text-sm uppercase">{t.landing_cta_portal}</h4>
+                   <p className="text-xs text-tech-secondary mt-1">{t.landing_secure_identity || "Blockchain-ready consent ledger"}</p>
                 </div>
              </div>
           </div>
@@ -101,7 +104,16 @@ export const Login: React.FC<LoginProps> = ({ onLogin, t }) => {
           <div className="bg-tech-card border border-tech-border rounded-2xl p-8 shadow-2xl relative overflow-hidden">
              {/* Top decorative line */}
              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-tech-cyan to-transparent"></div>
-             
+
+             {onBack && (
+               <button
+                  onClick={onBack}
+                  className="mb-5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-tech-secondary hover:text-tech-cyan transition-colors"
+               >
+                  <ArrowLeft size={12} /> {t.landing_back_home || "Agro AI home"}
+               </button>
+             )}
+
              {!role ? (
                <div className="animate-slide-up">
                   <h2 className="text-2xl font-display font-bold text-tech-primary mb-2">Select Portal</h2>

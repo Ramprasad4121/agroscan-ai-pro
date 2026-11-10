@@ -32,6 +32,7 @@ import { AgriPassport } from './components/AgriPassport';
 import { Community } from './components/Community';
 import { WhatsAppBot } from './components/WhatsAppBot';
 import { DroneServices } from './components/DroneServices';
+import { Landing } from './components/Landing';
 import { PlantDiagnosis, User, ViewState } from './types';
 import { Leaf, Share2, MessageCircle, Loader2 } from 'lucide-react';
 import { LanguageCode } from './translations';
@@ -58,8 +59,8 @@ const App: React.FC = () => {
     return readSession();
   });
   const [view, setView] = useState<ViewState>(() => {
-    if (typeof window === 'undefined') return 'login';
-    return readSession() ? 'home' : 'login';
+    if (typeof window === 'undefined') return 'landing';
+    return readSession() ? 'home' : 'landing';
   });
   const [currentImage, setCurrentImage] = useState<string | null>(null);
   const [diagnosis, setDiagnosis] = useState<PlantDiagnosis | null>(null);
@@ -132,7 +133,7 @@ const App: React.FC = () => {
 
   const handleLogout = () => {
     setUser(null);
-    setView('login');
+    setView('landing');
     setDiagnosis(null);
     setCurrentImage(null);
     setLanguage(null);
@@ -161,13 +162,17 @@ const App: React.FC = () => {
   // --- LAYOUT & BACKGROUND ---
   // Using the "Tech Grid" pattern via CSS class `bg-tech-pattern`
   
+  if (view === 'landing') {
+    return <Landing t={t} onEnterPortal={() => setView('login')} />;
+  }
+
   if (view === 'login') {
     return (
       <div className="min-h-screen flex flex-col bg-tech-pattern text-tech-primary relative overflow-hidden">
          {/* Subtle decorative glow for tech feel */}
          <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-tech-cyan/5 to-transparent pointer-events-none"></div>
          <div className="relative z-10 w-full h-full flex flex-col">
-            <Login onLogin={handleLogin} t={t} />
+            <Login onLogin={handleLogin} onBack={() => setView('landing')} t={t} />
          </div>
       </div>
     );

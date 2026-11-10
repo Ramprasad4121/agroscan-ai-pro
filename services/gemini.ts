@@ -172,6 +172,46 @@ export const chatWithAgronomist = async (
 
 // --- NEW FEATURES ---
 
+// 0. Agro AI farmer assistant — the conversational front door.
+// Grounded with Google Search so it can answer live questions (mandi prices,
+// schemes, weather) instead of relying on memory.
+export const askAgroAI = async (
+  history: { role: 'user' | 'model', text: string }[],
+  newMessage: string,
+  language: string = 'English'
+) => {
+  return retryWithBackoff(async () => {
+    const chat = getAI().chats.create({
+      model: 'gemini-2.5-flash',
+      config: {
+        tools: [{ googleSearch: {} }],
+        systemInstruction: `You are Agro AI, the single AI assistant for Indian farmers. You help with land and soil, growing crops, government schemes, finance, buying inputs, finding markets and connecting to services.
+
+Rules:
+- Answer in ${language}, in simple farmer-friendly language: short sentences, no jargon unless you explain it in the same line.
+- Use Google Search for anything current: mandi prices (give INR per quintal and the market name), government schemes (PM-KISAN, Kisan Credit Card, PM Fasal Bima Yojana, eNAM, soil health cards), weather, fertiliser and pesticide availability.
+- For a scheme, state who is eligible, the documents needed and the benefit.
+- For a crop problem, give the immediate steps to take in the next 48 hours first, then prevention, and suggest a photo scan for an exact diagnosis.
+- If the answer depends on the farmer's field (crop, stage, location, soil), ask ONE short clarifying question instead of guessing.
+- Keep answers under about 120 words unless the farmer asks for detail.
+- Format as plain text only: no markdown, no asterisks, no '#' headings. Use short numbered lines (1., 2., 3.) instead of bullets.
+- Never invent prices, deadlines or subsidy amounts. Search first; if you cannot confirm, say so plainly.`
+      },
+      history: history.map(h => ({
+        role: h.role,
+        parts: [{ text: h.text }]
+      }))
+    });
+
+    const result = await chat.sendMessage({ message: newMessage });
+
+    return {
+      text: result.text || "",
+      groundingMetadata: result.candidates?.[0]?.groundingMetadata
+    };
+  });
+};
+
 // 1. Chat with Search Grounding
 export const chatWithSearch = async (
   history: { role: 'user' | 'model', text: string }[], 

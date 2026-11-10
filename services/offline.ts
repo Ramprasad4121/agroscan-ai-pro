@@ -1,7 +1,8 @@
 
 import { SyncQueueItem } from '../types';
+import { STORAGE_KEYS } from '../utils';
 
-const QUEUE_KEY = 'agroscan_sync_queue';
+const QUEUE_KEY = STORAGE_KEYS.syncQueue;
 
 // Helper to simulate "Optimistic Updates"
 export const offlineService = {

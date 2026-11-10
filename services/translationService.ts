@@ -1,6 +1,7 @@
 
 import { getLanguageName } from '../translations';
 import { getAI } from './gemini';
+import { STORAGE_KEYS } from '../utils';
 
 interface CacheEntry {
   [text: string]: string;
@@ -10,7 +11,7 @@ interface TranslationCache {
   [languageCode: string]: CacheEntry;
 }
 
-const CACHE_KEY = 'agroscan_translation_cache';
+const CACHE_KEY = STORAGE_KEYS.translationCache;
 
 /**
  * AI translation via Gemini.

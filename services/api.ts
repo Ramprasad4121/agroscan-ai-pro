@@ -147,7 +147,7 @@ function getNameForRole(role: UserRole): string {
     case 'company': return 'Mahindra Agri Solutions';
     case 'insurance': return 'AIC of India';
     case 'service_provider': return 'Ravi Logistics';
-    default: return 'AgroScan Admin';
+    default: return 'Agro AI Admin';
   }
 }
 

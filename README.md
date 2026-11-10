@@ -1,23 +1,22 @@
-  # 🌱 AgroScan AI Pro 🤖
-  
-  **The Unified AI Ecosystem for Next-Gen Agriculture**
-  
-  [![React](https://img.shields.io/badge/React-18-blue?logo=react)](https://reactjs.org/)
-  [![Vite](https://img.shields.io/badge/Vite-4-purple?logo=vite)](https://vitejs.dev/)
-  [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://www.typescriptlang.org/)
-  [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3-cyan?logo=tailwindcss)](https://tailwindcss.com/)
-  
-  [Features](#-key-features) • [Tech Stack](#-tech-stack) • [Getting Started](#-getting-started) • [Architecture](#-architecture) • [AI Integration](#-ai-integration-details)
 
-</div>
+# 🌱 Agro AI 🤖
+
+**The Unified AI Ecosystem for Next-Gen Agriculture**
+
+[![React](https://img.shields.io/badge/React-18-blue?logo=react)](https://reactjs.org/)
+[![Vite](https://img.shields.io/badge/Vite-4-purple?logo=vite)](https://vitejs.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3-cyan?logo=tailwindcss)](https://tailwindcss.com/)
+
+[Features](#-key-features) • [Tech Stack](#-tech-stack) • [Getting Started](#-getting-started) • [AI Integration](#-ai-integration-details)
 
 ---
 
 ## 🚀 Overview
 
-**AgroScan AI Pro** is a cutting-edge agricultural platform designed to bridge the gap between farmers, technology, and the market. It leverages **Multimodal AI** to provide real-time plant diagnosis, crop management advice, financial guidance, and market intelligence. 
+**Agro AI** is a cutting-edge agricultural platform designed to bridge the gap between farmers, technology, and the market. It leverages **Multimodal AI** to provide real-time plant diagnosis, crop management advice, financial guidance, and market intelligence.
 
-Unlike simple crop doctor apps, AgroScan AI Pro creates a **complete ecosystem** connecting:
+Unlike simple crop doctor apps, Agro AI creates a **complete ecosystem** connecting:
 *   👨‍🌾 **Farmers:** for intelligent crop management.
 *   🛒 **Consumers:** for direct farm-to-table access.
 *   🏢 **FPOs (Farmer Producer Organizations):** for bulk trade and management.
@@ -61,24 +60,22 @@ Unlike simple crop doctor apps, AgroScan AI Pro creates a **complete ecosystem**
 *   **AI Engine:** [Google Gemini API](https://ai.google.dev/) (`@google/genai`)
 *   **Icons:** [Lucide React](https://lucide.dev/)
 *   **State Management:** React Hooks & Context
-*   **Internationalization:** Custom logic supporting 20+ languages
+*   **Internationalization:** Gemini-powered translation for 20+ languages, with a local cache
 
 ---
 
 ## ⚡ Getting Started
 
-Follow these steps to set up the project locally.
-
 ### Prerequisites
 *   **Node.js** (v16 or higher)
 *   **npm** or **yarn**
-
+*   A free **Gemini API key** — [get one here](https://aistudio.google.com/apikey)
 
 ### Installation
 
 1.  **Clone the repository**
     ```bash
-    git clone https://github.com/yourusername/agroscan-ai-pro.git
+    git clone https://github.com/Ramprasad4121/agroscan-ai-pro.git
     cd agroscan-ai-pro
     ```
 
@@ -86,15 +83,45 @@ Follow these steps to set up the project locally.
     ```bash
     npm install
     ```
-3.  **Run Development Server**
+
+3.  **Configure the environment**
+    ```bash
+    cp .env.example .env
+    # then paste your key into .env
+    VITE_GEMINI_API_KEY=your_key_here
+    ```
+    Only `VITE_GEMINI_API_KEY` is required; every AI feature (scan, chat, voice,
+    visualizer, translation, market search) uses it. Without a key the app still
+    runs and shows graceful fallbacks instead of failing.
+
+4.  **Run Development Server**
     ```bash
     npm run dev
     ```
     Open [http://localhost:5173](http://localhost:5173) to view it in the browser.
 
+5.  **Production build**
+    ```bash
+    npm run build      # type-check + bundle to dist/
+    npm run preview    # serve the production build
+    ```
 
+---
 
+## 🤖 AI Integration Details
 
+| Feature | Model | Notes |
+|---|---|---|
+| Plant diagnosis | `gemini-2.5-flash` (vision) | Leaf/plant image in, structured diagnosis out |
+| Agronomist chat | `gemini-2.5-pro` | Follow-up Q&A grounded in the scan result |
+| Farm visualizer | `gemini-2.5-flash-image` → `gemini-3.1-flash-image` → `imagen-4.0` | Fallback chain with graceful quota messaging |
+| Voice assistant | `gemini-2.5-flash-native-audio-preview` | Live bidirectional audio |
+| Text-to-speech | `gemini-2.5-flash-preview-tts` | Reads diagnoses aloud |
+| Translation | `gemini-2.5-flash` | Batched dictionary translation, cached in the browser |
+| Market search | `gemini-2.5-flash` + Google Maps grounding | Grounded mandi rates and nearby resources |
+
+Free-tier quotas are respected: every AI call retries with backoff, and the UI
+degrades gracefully (cached or English text) instead of showing a blank screen.
 
 ---
 
@@ -107,7 +134,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 3.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
 4.  Push to the Branch (`git push origin feature/AmazingFeature`)
 5.  Open a Pull Request
-
 
 ---
 

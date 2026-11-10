@@ -36,8 +36,9 @@ import { PlantDiagnosis, User, ViewState } from './types';
 import { Leaf, Share2, MessageCircle, Loader2 } from 'lucide-react';
 import { LanguageCode } from './translations';
 import { useTranslation } from './hooks/useTranslation';
+import { STORAGE_KEYS } from './utils';
 
-const SESSION_KEY = 'agroscan_user';
+const SESSION_KEY = STORAGE_KEYS.session;
 
 const readSession = (): User | null => {
   try {
@@ -66,7 +67,7 @@ const App: React.FC = () => {
   const [showWhatsApp, setShowWhatsApp] = useState(false);
   
   const [language, setLanguage] = useState<string | null>(() => {
-    const saved = localStorage.getItem('app_language');
+    const saved = localStorage.getItem(STORAGE_KEYS.language);
     return saved || null;
   });
   
@@ -77,7 +78,7 @@ const App: React.FC = () => {
 
   const handleSetLanguage = (lang: string) => {
     setLanguage(lang);
-    localStorage.setItem('app_language', lang);
+    localStorage.setItem(STORAGE_KEYS.language, lang);
   };
 
   // Theme Management based on Role
@@ -117,7 +118,7 @@ const App: React.FC = () => {
     }
 
     if (userData.role === 'farmer') {
-      const hasSeenTour = localStorage.getItem('hasSeenTour');
+      const hasSeenTour = localStorage.getItem(STORAGE_KEYS.tourSeen);
       if (!hasSeenTour) {
         setTimeout(() => setShowTour(true), 1000);
       }
@@ -126,7 +127,7 @@ const App: React.FC = () => {
 
   const handleTourComplete = () => {
     setShowTour(false);
-    localStorage.setItem('hasSeenTour', 'true');
+    localStorage.setItem(STORAGE_KEYS.tourSeen, 'true');
   };
 
   const handleLogout = () => {
@@ -137,7 +138,7 @@ const App: React.FC = () => {
     setLanguage(null);
     try {
       localStorage.removeItem(SESSION_KEY);
-      localStorage.removeItem('app_language');
+      localStorage.removeItem(STORAGE_KEYS.language);
     } catch {
       // ignore storage errors on logout
     }

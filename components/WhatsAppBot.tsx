@@ -160,7 +160,7 @@ export const WhatsAppBot: React.FC<WhatsAppBotProps> = ({ t, languageCode, userL
                  <img src="https://cdn-icons-png.flaticon.com/512/4712/4712109.png" alt="Bot" className="w-8 h-8" />
               </div>
               <div>
-                 <h3 className="font-bold text-base leading-tight">AgroScan Bot ✅</h3>
+                 <h3 className="font-bold text-base leading-tight">Agro AI Bot ✅</h3>
                  <p className="text-xs text-white/80">Online</p>
               </div>
            </div>

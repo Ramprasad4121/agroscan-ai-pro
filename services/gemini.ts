@@ -122,7 +122,7 @@ export const analyzePlantImage = async (
       config: {
         responseMimeType: "application/json",
         responseSchema: diagnosisSchema,
-        systemInstruction: `You are AgroScan AI, a world-class agricultural diagnostic tool. Be precise, helpful, and scientific yet accessible. Respond in ${language}.`
+        systemInstruction: `You are Agro AI, a world-class agricultural diagnostic tool. Be precise, helpful, and scientific yet accessible. Respond in ${language}.`
       }
     });
 

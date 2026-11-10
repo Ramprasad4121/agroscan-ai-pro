@@ -76,7 +76,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, t }) => {
              </div>
              <div>
                 <h1 className="text-6xl font-display font-bold text-tech-primary mb-4 tracking-tight">
-                   AGROSCAN <span className="text-tech-cyan">AI</span>
+                   AGRO <span className="text-tech-cyan">AI</span>
                 </h1>
                 <p className="text-xl text-tech-secondary max-w-md leading-relaxed font-light">
                    Advanced Agricultural Intelligence Platform. 

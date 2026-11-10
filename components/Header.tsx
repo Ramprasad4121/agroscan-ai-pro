@@ -73,7 +73,7 @@ export const Header: React.FC<HeaderProps> = ({ user, onNavigate, onLogout, curr
              </div>
              <div className="hidden md:block">
                 <span className="font-display font-bold text-xl tracking-tight text-tech-primary">
-                  AGROSCAN <span className="text-tech-cyan">AI</span>
+                  AGRO <span className="text-tech-cyan">AI</span>
                 </span>
                 <span className="block text-[10px] text-tech-secondary uppercase tracking-[0.2em] leading-none">Professional</span>
              </div>

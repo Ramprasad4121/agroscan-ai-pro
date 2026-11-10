@@ -32,7 +32,7 @@ export const getLanguageName = (code: string): string => {
 
 export const defaultTranslations = {
   // App General
-  app_name: "AgroScan AI Pro",
+  app_name: "Agro AI",
   app_tagline: "The unified ecosystem connecting Farmers to Banks, Markets, and Government.",
 
   // Dashboard chrome (previously hardcoded in Hero/Header/DashboardWidgets)
@@ -344,7 +344,7 @@ export const defaultTranslations = {
   hire_worker: "Hire",
   
   // WhatsApp Bot
-  whatsapp_title: "AgroScan Bot",
+  whatsapp_title: "Agro AI Bot",
   whatsapp_subtitle: "24/7 Chat Assistant",
   whatsapp_desc: "Chat comfortably like a friend.",
   whatsapp_btn: "Chat on WhatsApp",
@@ -388,7 +388,7 @@ export const defaultTranslations = {
   active_batches: "Active Batches",
   
   // Tour
-  tour_welcome_title: "Welcome to AgroScan AI!",
+  tour_welcome_title: "Welcome to Agro AI!",
   tour_welcome_desc: "Let's quickly show you how to use this app to increase your farm's profit.",
   tour_diagnose_title: "Scan Sickness",
   tour_diagnose_desc: "Take a photo of your crop here. We will tell you the disease and the medicine.",

@@ -1,4 +1,42 @@
 
+// --- Storage keys (single source of truth) ---
+export const STORAGE_KEYS = {
+  session: 'agro_ai_user',
+  language: 'agro_ai_language',
+  tourSeen: 'agro_ai_seen_tour',
+  translationCache: 'agro_ai_translation_cache',
+  syncQueue: 'agro_ai_sync_queue',
+} as const;
+
+// Keys written by older builds; moved to the current names on first run.
+const LEGACY_STORAGE_KEYS: Record<string, string> = {
+  agroscan_user: STORAGE_KEYS.session,
+  app_language: STORAGE_KEYS.language,
+  hasSeenTour: STORAGE_KEYS.tourSeen,
+  agroscan_translation_cache: STORAGE_KEYS.translationCache,
+  agroscan_sync_queue: STORAGE_KEYS.syncQueue,
+};
+
+/**
+ * One-time, non-destructive migration of legacy localStorage keys so an
+ * existing session, language choice, translation cache or offline queue
+ * survives the rename.
+ */
+export const migrateStorageKeys = (): void => {
+  try {
+    Object.entries(LEGACY_STORAGE_KEYS).forEach(([legacy, current]) => {
+      const value = localStorage.getItem(legacy);
+      if (value === null) return;
+      if (localStorage.getItem(current) === null) {
+        localStorage.setItem(current, value);
+      }
+      localStorage.removeItem(legacy);
+    });
+  } catch {
+    // storage unavailable (private mode / quota) — nothing to migrate
+  }
+};
+
 export const fileToGenerativePart = async (file: File): Promise<{ inlineData: { data: string; mimeType: string } }> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();

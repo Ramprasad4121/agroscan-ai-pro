@@ -19,7 +19,7 @@ export const Community: React.FC<CommunityProps> = ({ t, userLocation }) => {
       author: 'Ramesh Patil',
       role: 'Farmer',
       content: 'My cotton crop leaves are turning red. Is this a magnesium deficiency or pests? I have applied Urea last week.',
-      image: 'https://images.unsplash.com/photo-1623227866882-c005c2681359?auto=format&fit=crop&q=80&w=500',
+      image: 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&q=80&w=500',
       likes: 24,
       comments: 5,
       timestamp: '2h ago',

@@ -13,6 +13,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, t }) => {
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [role, setRole] = useState<UserRole | null>(null);
   const [loading, setLoading] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   // Fields
   const [identifier, setIdentifier] = useState('');
@@ -28,6 +29,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, t }) => {
     e.preventDefault();
     if (!role) return;
     setLoading(true);
+    setAuthError(null);
     try {
       let user: User;
       if (mode === 'login') {
@@ -40,6 +42,11 @@ export const Login: React.FC<LoginProps> = ({ onLogin, t }) => {
       onLogin(user);
     } catch (error) {
       setLoading(false);
+      setAuthError(
+        error instanceof Error && error.message
+          ? error.message
+          : (t?.login_error || "Login failed. Please check your details and try again.")
+      );
     }
   };
 
@@ -161,6 +168,12 @@ export const Login: React.FC<LoginProps> = ({ onLogin, t }) => {
                            {!loading && <ArrowRight size={18} />}
                         </button>
                      </div>
+
+                     {authError && (
+                        <div className="mt-3 px-3 py-2 rounded-lg bg-red-500/10 border border-red-500/40 text-red-400 text-xs font-bold text-center">
+                           {authError}
+                        </div>
+                     )}
 
                      <div className="text-center pt-4">
                         <button type="button" onClick={() => setMode(mode === 'login' ? 'signup' : 'login')} className="text-xs font-bold text-tech-secondary hover:text-tech-cyan uppercase tracking-wide">

@@ -23,7 +23,7 @@ export const ImageGenerator: React.FC<ImageGeneratorProps> = ({ t }) => {
       const image = await generateGardenImage(prompt, aspectRatio);
       setGeneratedImage(image);
     } catch (err) {
-      setError("Failed to generate image. Please try again.");
+      setError(err instanceof Error && err.message ? err.message : "Failed to generate image. Please try again.");
     } finally {
       setIsGenerating(false);
     }
@@ -43,7 +43,7 @@ export const ImageGenerator: React.FC<ImageGeneratorProps> = ({ t }) => {
         <div className="mb-8 text-center max-w-2xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-50 border border-purple-200 text-purple-700 text-sm font-medium mb-4">
             <Sparkles size={14} />
-            Powered by Imagen 4.0
+            Powered by Gemini AI
           </div>
           <h2 className="text-3xl md:text-4xl font-display font-bold text-slate-900 mb-3">
             {t.gen_title}

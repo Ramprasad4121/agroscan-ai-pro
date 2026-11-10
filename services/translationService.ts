@@ -1,5 +1,6 @@
 
-import { LANGUAGES } from '../translations';
+import { getLanguageName } from '../translations';
+import { getAI } from './gemini';
 
 interface CacheEntry {
   [text: string]: string;
@@ -10,8 +11,13 @@ interface TranslationCache {
 }
 
 const CACHE_KEY = 'agroscan_translation_cache';
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY; 
 
+/**
+ * AI translation via Gemini.
+ * The Google Cloud Translation API (translation.googleapis.com) rejects
+ * AI-Studio API keys (401 UNAUTHENTICATED), and adding a Cloud billing key was
+ * not an option, so translations are produced with gemini-2.5-flash instead.
+ */
 export class TranslationService {
   private static cache: TranslationCache = TranslationService.loadCache();
 
@@ -47,29 +53,17 @@ export class TranslationService {
       return this.cache[targetLang][text];
     }
 
-    // 2. API Call (Using Google Cloud Translation API v2 for API Key simplicity)
-    // Note: For V3, a backend proxy is recommended to handle auth tokens.
     try {
-      const response = await fetch(`https://translation.googleapis.com/language/translate/v2?key=${API_KEY}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          q: text,
-          target: targetLang,
-          format: 'text'
-        })
+      const language = getLanguageName(targetLang);
+      const response = await getAI().models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: { parts: [{ text: `Translate the following text to ${language}. Return ONLY the translation, nothing else.\n\n${text}` }] },
+        config: { temperature: 0.1 },
       });
+      const translatedText = (response.text || '').trim();
+      if (!translatedText) return text; // Fallback
 
-      const data = await response.json();
-      
-      if (data.error) {
-        console.error("Google Translation API Error:", data.error);
-        return text; // Fallback
-      }
-
-      const translatedText = data.data.translations[0].translatedText;
-
-      // 3. Update Cache
+      // Cache
       if (!this.cache[targetLang]) this.cache[targetLang] = {};
       this.cache[targetLang][text] = translatedText;
       this.saveCache();
@@ -82,23 +76,22 @@ export class TranslationService {
   }
 
   /**
-   * Batch translates a dictionary object (values only)
+   * Batch translates a dictionary object (values only).
    */
   static async translateDictionary(
-    sourceDict: Record<string, string>, 
+    sourceDict: Record<string, string>,
     targetLang: string
   ): Promise<Record<string, string>> {
     if (targetLang === 'en') return sourceDict;
 
     const result: Record<string, string> = { ...sourceDict };
-    
-    // Identify missing translations
-    const textsToTranslate: string[] = [];
-    const keysToMap: string[] = [];
 
     // 1. Check Cache first
     if (!this.cache[targetLang]) this.cache[targetLang] = {};
-    
+
+    const textsToTranslate: string[] = [];
+    const keysToMap: string[] = [];
+
     Object.entries(sourceDict).forEach(([key, text]) => {
       if (this.cache[targetLang][text]) {
         result[key] = this.cache[targetLang][text];
@@ -110,43 +103,54 @@ export class TranslationService {
 
     if (textsToTranslate.length === 0) return result;
 
-    // 2. Batch API Call
+    // 2. Gemini batch translation: one call per chunk of keys.
     try {
-      // Google API allows multiple 'q' parameters
-      // We might need to chunk this if the list is huge (limit usually 128 items per req)
-      const CHUNK_SIZE = 100;
-      
-      for (let i = 0; i < textsToTranslate.length; i += CHUNK_SIZE) {
-        const chunkTexts = textsToTranslate.slice(i, i + CHUNK_SIZE);
-        const chunkKeys = keysToMap.slice(i, i + CHUNK_SIZE);
+      const language = getLanguageName(targetLang);
+      const CHUNK_SIZE = 120;
 
-        const response = await fetch(`https://translation.googleapis.com/language/translate/v2?key=${API_KEY}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            q: chunkTexts,
-            target: targetLang,
-            format: 'text'
-          })
+      for (let i = 0; i < keysToMap.length; i += CHUNK_SIZE) {
+        const chunkKeys = keysToMap.slice(i, i + CHUNK_SIZE);
+        const chunkTexts = textsToTranslate.slice(i, i + CHUNK_SIZE);
+
+        const dictJson = JSON.stringify(Object.fromEntries(chunkKeys.map((k, j) => [k, chunkTexts[j]])));
+        const prompt = `Translate the VALUES of this JSON object to ${language}:\n\n${dictJson}`;
+        const response = await getAI().models.generateContent({
+          model: 'gemini-2.5-flash',
+          contents: {
+            parts: [{ text: prompt }],
+          },
+          config: {
+            temperature: 0.1,
+            systemInstruction: `You are a professional agricultural translation engine. Translate each VALUE in the provided JSON object from English to ${language}. Rules:
+1. Keep every KEY exactly as-is (do not translate keys).
+2. Keep the output a single valid JSON object with the identical keys.
+3. Use natural, simple farmer-friendly ${language}. Keep numbers, units (%, kg, ₹), crop names and UI labels sensible for farmers.
+4. Keep responses very short where the source is very short (button labels, section titles).
+5. Output ONLY the JSON object, no markdown, no explanations.`,
+          },
         });
 
-        const data = await response.json();
-        
-        if (data.data && data.data.translations) {
-          data.data.translations.forEach((item: any, index: number) => {
-             const originalText = chunkTexts[index];
-             const translatedText = item.translatedText;
-             const key = chunkKeys[index];
+        let raw = (response.text || '').trim();
+        // strip accidental code fences
+        raw = raw.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim();
+        const start = raw.indexOf('{');
+        const end = raw.lastIndexOf('}');
+        if (start === -1 || end === -1) throw new Error('Translation response was not JSON');
 
-             // Update Result
-             result[key] = translatedText;
+        const parsed = JSON.parse(raw.slice(start, end + 1)) as Record<string, string>;
 
-             // Update Cache
-             this.cache[targetLang][originalText] = translatedText;
-          });
-        }
+        chunkKeys.forEach((key) => {
+          const translated = parsed[key];
+          if (typeof translated === 'string' && translated.trim()) {
+            const originalText = result[key] ?? sourceDict[key];
+            result[key] = translated.trim();
+            if (originalText) {
+              this.cache[targetLang][originalText] = translated.trim();
+            }
+          }
+        });
       }
-      
+
       this.saveCache();
     } catch (e) {
       console.error("Batch translation failed", e);

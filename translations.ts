@@ -1,28 +1,31 @@
 
-export type LanguageCode = 'en' | 'hi' | 'bn' | 'te' | 'mr' | 'ta' | 'gu' | 'kn' | 'ml' | 'pa' | 'or' | 'as' | 'es' | 'fr' | 'pt' | 'id' | 'ar' | 'zh' | 'vi' | 'sw';
+export type LanguageCode = 'en' | 'hi' | 'bn' | 'te' | 'mr' | 'ta' | 'gu' | 'kn' | 'ml' | 'pa' | 'or' | 'as';
 
+/**
+ * Agro AI serves Indian agriculture, so the UI ships with English plus the
+ * Indian languages. Every non-English language is translated on demand with
+ * Gemini and cached in the browser; hand-written overrides (see
+ * LANGUAGE_OVERRIDES) refine the most visible strings.
+ */
 export const LANGUAGES: { code: string; name: string; localName: string }[] = [
   { code: 'en', name: 'English', localName: 'English' },
   { code: 'hi', name: 'Hindi', localName: 'हिंदी' },
-  { code: 'es', name: 'Spanish', localName: 'Español' },
-  { code: 'fr', name: 'French', localName: 'Français' },
-  { code: 'pt', name: 'Portuguese', localName: 'Português' },
-  { code: 'id', name: 'Indonesian', localName: 'Bahasa Indonesia' },
-  { code: 'ar', name: 'Arabic', localName: 'العربية' },
-  { code: 'zh', name: 'Chinese', localName: '中文' },
-  { code: 'sw', name: 'Swahili', localName: 'Kiswahili' },
-  { code: 'vi', name: 'Vietnamese', localName: 'Tiếng Việt' },
   { code: 'mr', name: 'Marathi', localName: 'मराठी' },
-  { code: 'gu', name: 'Gujarati', localName: 'ગુજરાતી' },
   { code: 'bn', name: 'Bengali', localName: 'বাংলা' },
   { code: 'te', name: 'Telugu', localName: 'తెలుగు' },
   { code: 'ta', name: 'Tamil', localName: 'தமிழ்' },
+  { code: 'gu', name: 'Gujarati', localName: 'ગુજરાતી' },
   { code: 'kn', name: 'Kannada', localName: 'ಕನ್ನಡ' },
   { code: 'ml', name: 'Malayalam', localName: 'മലയാളം' },
   { code: 'pa', name: 'Punjabi', localName: 'ਪੰਜਾਬੀ' },
   { code: 'or', name: 'Odia', localName: 'ଓଡ଼ିଆ' },
   { code: 'as', name: 'Assamese', localName: 'অসমীয়া' },
 ];
+
+export const SUPPORTED_LANGUAGE_CODES = LANGUAGES.map((l) => l.code);
+
+export const isSupportedLanguage = (code: string | null | undefined): boolean =>
+  !!code && SUPPORTED_LANGUAGE_CODES.includes(code);
 
 // Helper to get full English name for AI Prompting
 export const getLanguageName = (code: string): string => {
@@ -104,6 +107,8 @@ export const defaultTranslations = {
   status_offline: "Offline",
   status_syncing: "Syncing",
   status_pending: "Pending",
+  translation_loading: "Translating the app to",
+  translation_retry: "Retry",
   weather_live: "Live Weather",
   weather_warning: "Warning",
   weather_unavailable: "Data Unavailable",
@@ -159,6 +164,18 @@ export const defaultTranslations = {
   complete_reg: "Complete Registration",
   tap_to_speak: "Tap to Speak",
   welcome_back: "Welcome Back",
+  login_select_portal: "Select Portal",
+  login_choose_role: "Choose your role to access the dashboard.",
+  login_register_node: "Register Node",
+  login_user_id: "User ID / Mobile",
+  login_password: "Password",
+  login_authenticate: "AUTHENTICATE",
+  login_initialize: "INITIALIZE",
+  login_create_account: "Create New Account",
+  login_existing_user: "Existing User Login",
+  login_land_acres: "Land (Acres)",
+  login_back: "Back",
+  login_consent_required: "Please accept both the terms and the data-sharing consent to continue.",
 
   // Hero & Dashboard
   hero_title: "Your Smart Farming Companion",
@@ -473,16 +490,219 @@ export const defaultTranslations = {
   video_analyze_error: "Could not check video.",
 };
 
-export const TRANSLATIONS: Record<string, typeof defaultTranslations> = {
-  en: defaultTranslations,
+/**
+ * Keys shown first when a language is selected — the landing page, the app
+ * shell and the assistant. Translating these first makes the UI switch
+ * language within seconds instead of after the whole dictionary is done.
+ */
+export const PRIORITY_TRANSLATION_KEYS = [
+  'app_name',
+  'app_tagline',
+  'landing_tagline',
+  'landing_top_cta_hint',
+  'landing_choose_portal',
+  'landing_eyebrow',
+  'landing_headline',
+  'landing_intro',
+  'landing_intro2',
+  'landing_cta_ask',
+  'landing_cta_portal',
+  'landing_just_ask',
+  'landing_just_ask_title',
+  'landing_just_ask_body',
+  'landing_point_1',
+  'landing_point_2',
+  'landing_point_3',
+  'landing_cta_portal2',
+  'landing_vision',
+  'landing_belief',
+  'landing_tagline_line',
+  'landing_vision_short',
+  'landing_back_home',
+  'landing_real_time_data',
+  'landing_secure_identity',
+  'pillar_land',
+  'pillar_land_desc',
+  'pillar_crops',
+  'pillar_crops_desc',
+  'pillar_schemes',
+  'pillar_schemes_desc',
+  'pillar_finance',
+  'pillar_finance_desc',
+  'pillar_inputs',
+  'pillar_inputs_desc',
+  'pillar_markets',
+  'pillar_markets_desc',
+  'assistant_title',
+  'assistant_subtitle',
+  'assistant_greeting',
+  'assistant_placeholder',
+  'assistant_send',
+  'assistant_thinking',
+  'assistant_language',
+  'assistant_no_answer',
+  'assistant_quota',
+  'assistant_error',
+  'ask_soil_health',
+  'ask_scheme',
+  'ask_mandi_price',
+  'ask_crop_problem',
+  'ask_credit',
+  'ask_harvest',
+  'dashboard_label',
+  'view_passport',
+  'system_active',
+  'diagnosis_label',
+  'scan_hero_title',
+  'initiate_scan',
+  'assistant_card_title',
+  'assistant_card_desc',
+  'tools_grid_title',
+  'status_online',
+  'status_offline',
+  'status_syncing',
+  'status_pending',
+  'weather_live',
+  'weather_warning',
+  'weather_unavailable',
+  'weather_scanning',
+  'market_pulse',
+  'loading_market',
+  'select_language',
+  'welcome_farmer',
+];
+
+/**
+ * Hand-written overrides for the strings a farmer sees first.
+ *
+ * These are applied ON TOP of the Gemini-translated dictionary, so a language
+ * gets its character right where it matters most while the long tail is still
+ * machine translated and cached in the browser.
+ */
+export const LANGUAGE_OVERRIDES: Record<string, Partial<typeof defaultTranslations>> = {
   hi: {
-    ...defaultTranslations,
-    app_name: "एग्रोस्कैन एआई प्रो",
-    // ... (Keep existing Hindi translations if you wish, or let dynamic translator handle it if removed. 
-    // For safety, we keep the static Hindi as it was robust.)
+    app_name: "एग्रो एआई",
+    app_tagline: "किसानों को बैंक, बाज़ार और सरकार से जोड़ने वाला एकीकृत पारिस्थितिकी",
+
+    // Landing
+    landing_tagline: "किसान को जो चाहिए, सब कुछ",
+    landing_top_cta_hint: "किसान, एफपीओ, खरीदार, बैंक और सरकार के लिए",
+    landing_choose_portal: "अपना पोर्टल चुनें",
+    landing_eyebrow: "बस एक बातचीत दूर",
+    landing_headline: "किसान को जो चाहिए, सब कुछ — बस एक बातचीत दूर।",
+    landing_intro: "एग्रो एआई एक AI-आधारित प्लेटफ़ॉर्म है, जो किसान के जीवन के हर पहलू को आसान बनाता है।",
+    landing_intro2: "खेती की ज़मीन और मिट्टी की सेहत समझने से लेकर फसल उगाना, सरकारी योजनाएँ, वित्तीय सहायता, खेती के सामान, बाज़ार की जानकारी और ज़रूरी सेवाएँ — सब कुछ एक ही जगह।",
+    landing_cta_ask: "एग्रो एआई से पूछें",
+    landing_cta_portal: "अपने डैशबोर्ड में जाएँ",
+    landing_just_ask: "कई वेबसाइटों में भटकना नहीं पड़ता। बस सवाल पूछिए।",
+    landing_just_ask_title: "बस पूछिए।",
+    landing_just_ask_body: "एग्रो एआई समझता है, रास्ता बताता है और काम पूरा करने में मदद करता है — आपकी अपनी भाषा में।",
+    landing_point_1: "अपनी भाषा में बोलकर या लिखकर सहायक से बात करें।",
+    landing_point_2: "बिना खोजे मंडी भाव, योजना की पात्रता और मौसम की जानकारी पाएँ।",
+    landing_point_3: "फसल की फोटो स्कैन करें और तुरंत बीमारी की पहचान व कारगर सलाह पाएँ।",
+    landing_cta_portal2: "शुरू करें",
+    landing_vision: "हमारा लक्ष्य है कि किसानों, ज़मीन मालिकों, कृषि विशेषज्ञों, व्यवसायों, वित्तीय संस्थाओं और सरकारी सेवाओं को जोड़ने वाला एक एकीकृत डिजिटल पारिस्थितिकी तैयार करना।",
+    landing_belief: "हमारा मानना है कि तकनीक को किसान के अनुकूल होना चाहिए, न कि उल्टा।",
+    landing_tagline_line: "एक प्लेटफ़ॉर्म। एक AI। किसानों के लिए सब कुछ।",
+    landing_vision_short: "एक प्लेटफ़ॉर्म। एक AI। किसानों के लिए सब कुछ।",
+    landing_back_home: "एग्रो एआई होम",
+    landing_real_time_data: "लाइव मंडी भाव और सैटेलाइट फ़ीड",
+    landing_secure_identity: "सहमति लेजर के साथ सुरक्षित पहचान",
+
+    // Pillars
+    pillar_land: "ज़मीन और मिट्टी",
+    pillar_land_desc: "ज़मीन का रिकॉर्ड, मिट्टी की सेहत और योजना।",
+    pillar_crops: "फसल उगाएँ",
+    pillar_crops_desc: "फसल कैलेंडर, सलाह और बीमारी की पहचान।",
+    pillar_schemes: "योजनाएँ",
+    pillar_schemes_desc: "सरकारी योजनाएँ आसान भाषा में।",
+    pillar_finance: "वित्त",
+    pillar_finance_desc: "ऋण, बीमा और क्रेडिट।",
+    pillar_inputs: "सामान खरीदें",
+    pillar_inputs_desc: "बीज, खाद और उपकरण।",
+    pillar_markets: "बाज़ार खोजें",
+    pillar_markets_desc: "खरीदार, मंडी भाव और अनुमान।",
+
+    // Assistant
+    assistant_title: "एग्रो एआई से पूछें",
+    assistant_subtitle: "एक बातचीत, खेती की सभी सेवाएँ",
+    assistant_greeting: "अपनी खेती के बारे में कुछ भी पूछिए — मिट्टी, फसल, योजनाएँ, भाव या सामान। मैं आसान भाषा में जवाब दूँगा।",
+    assistant_placeholder: "अपनी खेती के बारे में पूछें...",
+    assistant_send: "भेजें",
+    assistant_thinking: "सोच रहा हूँ...",
+    assistant_language: "बातचीत की भाषा",
+    assistant_no_answer: "मुझे साफ़ जवाब नहीं मिला। कुछ और तरीके से पूछिए।",
+    assistant_quota: "सहायक अभी व्यस्त है। कृपया एक मिनट बाद कोशिश करें।",
+    assistant_error: "कुछ गड़बड़ हो गई। कृपया फिर कोशिश करें।",
+    ask_soil_health: "मिट्टी की सेहत कैसे सुधारें?",
+    ask_scheme: "मैं किस सरकारी योजना के लिए पात्र हूँ?",
+    ask_mandi_price: "आज नाशपाती का भाव कितना है?",
+    ask_crop_problem: "फसल के पत्ते पीले हो रहे हैं — मुझे क्या करना चाहिए?",
+    ask_credit: "किसान क्रेडिट कार्ड कैसे बनवाएँ?",
+    ask_harvest: "गेहूँ की कटाई कब करनी चाहिए?",
+
+    // Shell
+    dashboard_label: "डैशबोर्ड",
+    view_passport: "आधार देखें",
+    system_active: "सिस्टम चालू",
+    diagnosis_label: "एआई निदान",
+    scan_hero_title: "फसल की सेहत जाँचें",
+    initiate_scan: "शुरू करें",
+    assistant_card_title: "सहायक",
+    assistant_card_desc: "एआई विशेषज्ञ से बात करें",
+    tools_grid_title: "उपयोगी सुविधाएँ",
+    status_online: "ऑनलाइन",
+    status_offline: "ऑफ़लाइन",
+    status_syncing: "सिंक हो रहा है",
+    status_pending: "बाकी",
+    weather_live: "लाइव मौसम",
+    weather_warning: "चेतावनी",
+    weather_unavailable: "डेटा उपलब्ध नहीं",
+    weather_scanning: "उपग्रह से जानकारी आ रही है...",
+    market_pulse: "बाज़ार की हलचल",
+    loading_market: "बाज़ार डेटा लोड हो रहा है...",
+    select_language: "भाषा चुनें",
     welcome_farmer: "नमस्ते किसान भाई",
-    // ... (Truncated for brevity, assumed existing content remains)
+    error_generic: "कुछ गड़बड़ हो गई। फिर कोशिश करें।",
   },
-  // Other static languages (bn, te, mr, etc.) can remain here as high-quality overrides.
-  // The rest will be handled by dynamic translation hook.
+
+  mr: {
+    app_name: "ॲग्रो एआय",
+    landing_tagline: "शेतकऱ्याला जे हवी ते सर्व काही",
+    landing_top_cta_hint: "शेतकरी, एफपीओ, खरेदीदार, बँक आणि शासनासाठी",
+    landing_choose_portal: "तुमचा पोर्टल निवडा",
+    landing_eyebrow: "फक्त एक संवाद दूर",
+    landing_headline: "शेतकऱ्याला जे हवी ते सर्व काही — फक्त एक संवाद दूर.",
+    landing_intro: "ॲग्रो एआय हे AI-आधारित प्लॅटफॉर्म आहे, जे शेतकऱ्याच्या जीवनाचे प्रत्येक पैलू सोपे करते.",
+    landing_intro2: "जमिनीचा नोंद आणि मातीचे आरोग्य समजून घेण्यापासून पिकांची लागवड, शासकीय योजना, आर्थिक सहाय्य, शेती अवजारे, बाजारभाव आणि आवश्यक सेवा — सर्व काही एकाच ठिकाणी.",
+    landing_cta_ask: "ॲग्रो एआयला विचारा",
+    landing_cta_portal: "तुमच्या डॅशबोर्डमध्ये जा",
+    landing_just_ask: "अनेक वेबसाइटवर भटकायची गरज नाही. फक्त विचारा.",
+    landing_just_ask_title: "फक्त विचारा.",
+    landing_just_ask_body: "ॲग्रो एआय समजून घेते, मार्गदर्शन करते आणि काम पूर्ण करण्यास मदत करते — तुमच्याच भाषेत.",
+    landing_point_1: "तुमच्या भाषेत बोलून किंवा लिहून सहाय्यकाशी बोला.",
+    landing_point_2: "शोधाशिवाय मंडी भाव, योजना पात्रता आणि हवामान माहिती मिळवा.",
+    landing_point_3: "पिकाचा फोटो स्कॅन करा आणि तातडीत रोगाची ओळख व उपाय मिळवा.",
+    landing_cta_portal2: "सुरुवात करा",
+    landing_tagline_line: "एक प्लॅटफॉर्म. एक AI. शेतकऱ्यांसाठी सर्व काही.",
+    landing_vision_short: "एक प्लॅटफॉर्म. एक AI. शेतकऱ्यांसाठी सर्व काही.",
+    pillar_land: "जमीन व माती",
+    pillar_crops: "पीक लावा",
+    pillar_schemes: "योजना",
+    pillar_finance: "वित्तपुरवठा",
+    pillar_inputs: "साहित्य खरेदी",
+    pillar_markets: "बाजार शोधा",
+    assistant_title: "ॲग्रो एआयला विचारा",
+    assistant_greeting: "तुमच्या शेतीबद्दल काहीही विचारा — माती, पीक, योजना, भाव किंवा साहित्य. मी साध्या भाषेत उत्तर देतो.",
+    assistant_placeholder: "तुमच्या शेतीबद्दल विचारा...",
+    assistant_thinking: "विचार करतोय...",
+    dashboard_label: "डॅशबोर्ड",
+    system_active: "प्रणाली चालू",
+    scan_hero_title: "पिकाचे आरोग्य तपासा",
+    initiate_scan: "सुरू करा",
+    tools_grid_title: "उपयोगी सविधाने",
+    select_language: "भाषा निवडा",
+    welcome_farmer: "नमस्कार शेतकरी मित्रा",
+  },
 };
+

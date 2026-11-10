@@ -33,9 +33,10 @@ import { Community } from './components/Community';
 import { WhatsAppBot } from './components/WhatsAppBot';
 import { DroneServices } from './components/DroneServices';
 import { Landing } from './components/Landing';
+import { TranslationStatus } from './components/TranslationStatus';
 import { PlantDiagnosis, User, ViewState } from './types';
-import { Leaf, Share2, MessageCircle, Loader2 } from 'lucide-react';
-import { LanguageCode } from './translations';
+import { Leaf, Share2, MessageCircle, Loader2, AlertTriangle } from 'lucide-react';
+import { LanguageCode, isSupportedLanguage, getLanguageName } from './translations';
 import { useTranslation } from './hooks/useTranslation';
 import { STORAGE_KEYS } from './utils';
 
@@ -69,13 +70,18 @@ const App: React.FC = () => {
   
   const [language, setLanguage] = useState<string | null>(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.language);
+    // Ignore a language we no longer support (e.g. from an older build)
+    if (saved && !isSupportedLanguage(saved)) {
+      localStorage.removeItem(STORAGE_KEYS.language);
+      return null;
+    }
     return saved || null;
   });
-  
+
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
   const [showTour, setShowTour] = useState(false);
 
-  const { t, isTranslating } = useTranslation(language);
+  const { t, isTranslating, error: translationError, retry: retryTranslation, targetLanguage } = useTranslation(language);
 
   const handleSetLanguage = (lang: string) => {
     setLanguage(lang);
@@ -163,7 +169,24 @@ const App: React.FC = () => {
   // Using the "Tech Grid" pattern via CSS class `bg-tech-pattern`
   
   if (view === 'landing') {
-    return <Landing t={t} onEnterPortal={() => setView('login')} />;
+    return (
+      <>
+        <Landing
+          t={t}
+          onEnterPortal={() => setView('login')}
+          language={language}
+          onLanguageChange={handleSetLanguage}
+          isTranslating={isTranslating}
+        />
+        <TranslationStatus
+          t={t}
+          isTranslating={isTranslating}
+          error={translationError}
+          targetLanguage={targetLanguage}
+          onRetry={retryTranslation}
+        />
+      </>
+    );
   }
 
   if (view === 'login') {
@@ -292,16 +315,13 @@ const App: React.FC = () => {
           t={t}
         />
         
-        {isTranslating && (
-          <div className="fixed inset-0 z-50 bg-tech-bg/80 backdrop-blur-sm flex items-center justify-center">
-            <div className="tech-card p-6 rounded-lg flex items-center gap-4">
-               <Loader2 size={32} className="text-tech-cyan animate-spin" />
-               <div>
-                  <h3 className="font-bold text-tech-primary font-display">TRANSLATING SYSTEM...</h3>
-               </div>
-            </div>
-          </div>
-        )}
+        <TranslationStatus
+          t={t}
+          isTranslating={isTranslating}
+          error={translationError}
+          targetLanguage={targetLanguage}
+          onRetry={retryTranslation}
+        />
 
         <main className="flex-grow flex flex-col relative pt-4 md:pt-6">
           {renderRoleBasedInterface()}

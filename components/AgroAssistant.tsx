@@ -8,8 +8,10 @@ import { ChatMessage } from '../types';
 
 interface AgroAssistantProps {
   t: any;
-  /** Initial language for the conversation (falls back to English). */
+  /** Language the conversation runs in (falls back to English). */
   languageCode?: string;
+  /** Called when the farmer picks a different conversation language. */
+  onLanguageChange?: (code: string) => void;
   /** Compact mode for tight spaces. */
   compact?: boolean;
 }
@@ -23,14 +25,32 @@ const SUGGESTION_KEYS = [
   'ask_harvest',
 ];
 
-export const AgroAssistant: React.FC<AgroAssistantProps> = ({ t, languageCode = 'en', compact = false }) => {
+export const AgroAssistant: React.FC<AgroAssistantProps> = ({
+  t,
+  languageCode = 'en',
+  onLanguageChange,
+  compact = false,
+}) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [language, setLanguage] = useState(languageCode);
+  const [localLanguage, setLocalLanguage] = useState(languageCode);
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Follow the app language when it changes (e.g. picked in the header)
+  useEffect(() => {
+    setLocalLanguage(languageCode);
+  }, [languageCode]);
+
+  const activeLanguage = onLanguageChange ? languageCode : localLanguage;
+
+  const handleLanguagePick = (code: string) => {
+    setLocalLanguage(code);
+    setLangMenuOpen(false);
+    onLanguageChange?.(code);
+  };
 
   // Greeting when the panel first opens
   useEffect(() => {
@@ -65,7 +85,7 @@ export const AgroAssistant: React.FC<AgroAssistantProps> = ({ t, languageCode = 
       const result = await askAgroAI(
         messages.map((m) => ({ role: m.role, text: m.text })),
         question,
-        getLanguageName(language)
+        getLanguageName(activeLanguage)
       );
       setMessages((prev) => [
         ...prev,
@@ -88,7 +108,7 @@ export const AgroAssistant: React.FC<AgroAssistantProps> = ({ t, languageCode = 
     }
   };
 
-  const languageName = getLanguageName(language);
+  const languageName = getLanguageName(activeLanguage);
 
   return (
     <div className={`flex flex-col overflow-hidden bg-tech-card border border-tech-border rounded-2xl shadow-2xl ${compact ? 'h-[420px]' : 'h-full max-h-[560px]'}`}>
@@ -110,6 +130,8 @@ export const AgroAssistant: React.FC<AgroAssistantProps> = ({ t, languageCode = 
         <div className="relative shrink-0">
           <button
             onClick={() => setLangMenuOpen((v) => !v)}
+            aria-label={t.assistant_language || "Conversation language"}
+            aria-expanded={langMenuOpen}
             className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-tech-bg border border-tech-border text-[10px] font-bold text-tech-secondary hover:border-tech-cyan/50 transition-colors"
             title={t.assistant_language || "Conversation language"}
           >
@@ -121,12 +143,9 @@ export const AgroAssistant: React.FC<AgroAssistantProps> = ({ t, languageCode = 
               {LANGUAGES.map((lang) => (
                 <button
                   key={lang.code}
-                  onClick={() => {
-                    setLanguage(lang.code);
-                    setLangMenuOpen(false);
-                  }}
+                  onClick={() => handleLanguagePick(lang.code)}
                   className={`w-full text-left px-3 py-2 text-xs hover:bg-tech-bg flex items-center justify-between transition-colors ${
-                    language === lang.code ? 'text-tech-cyan' : 'text-tech-secondary'
+                    activeLanguage === lang.code ? 'text-tech-cyan' : 'text-tech-secondary'
                   }`}
                 >
                   <span>{lang.name}</span>

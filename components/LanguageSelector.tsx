@@ -40,7 +40,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, us
           
           <p className="text-lg text-slate-500 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed mb-6">
              Select your preferred language.<br/>
-             We support 30+ languages with AI translation.
+             English and 11 Indian languages, translated instantly with AI.
           </p>
 
           {/* Search Bar */}
@@ -84,9 +84,15 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, us
            ))}
         </div>
         
-        <div className="mt-auto pt-6 text-center shrink-0">
+        <div className="mt-auto pt-6 flex flex-col items-center gap-3 shrink-0">
+           <button
+              onClick={() => onSelect('en')}
+              className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 hover:text-agro-600 transition-colors"
+           >
+              Continue in English
+           </button>
            <p className="text-xs font-medium text-slate-400 bg-white/50 dark:bg-slate-900/50 inline-block px-4 py-2 rounded-full backdrop-blur-sm border border-slate-100 dark:border-slate-800">
-             🔒 Secure Language Setting • Google Cloud Translation API
+              🔒 Your choice is saved on this device • AI translation, cached for offline use
            </p>
         </div>
       </div>

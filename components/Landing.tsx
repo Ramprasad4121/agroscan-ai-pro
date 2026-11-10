@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Sprout,
   Droplets,
@@ -12,12 +12,18 @@ import {
   ShieldCheck,
   Sparkles,
   MessageCircle,
+  Check,
 } from 'lucide-react';
 import { AgroAssistant } from './AgroAssistant';
+import { LANGUAGES } from '../translations';
 
 interface LandingProps {
   t: any;
   onEnterPortal: () => void;
+  /** Currently selected UI language (null = not chosen yet). */
+  language?: string | null;
+  onLanguageChange?: (code: string) => void;
+  isTranslating?: boolean;
 }
 
 const PILLARS = [
@@ -29,7 +35,16 @@ const PILLARS = [
   { icon: Globe, key: 'pillar_markets' },
 ];
 
-export const Landing: React.FC<LandingProps> = ({ t, onEnterPortal }) => {
+export const Landing: React.FC<LandingProps> = ({
+  t,
+  onEnterPortal,
+  language,
+  onLanguageChange,
+  isTranslating = false,
+}) => {
+  const [langMenuOpen, setLangMenuOpen] = useState(false);
+  const currentLang = LANGUAGES.find((l) => l.code === language);
+
   return (
     <div className="min-h-screen bg-tech-pattern text-tech-primary flex flex-col">
       {/* ── Top bar ───────────────────────────────────────────── */}
@@ -53,6 +68,42 @@ export const Landing: React.FC<LandingProps> = ({ t, onEnterPortal }) => {
             <span className="hidden md:inline text-[10px] uppercase tracking-[0.18em] text-tech-secondary">
               {t.landing_top_cta_hint || "For farmers, FPOs, buyers, banks & government"}
             </span>
+
+            {/* Language picker */}
+            {onLanguageChange && (
+              <div className="relative">
+                <button
+                  onClick={() => setLangMenuOpen((v) => !v)}
+                  aria-label={t.select_language || "Select language"}
+                  aria-expanded={langMenuOpen}
+                  className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg bg-tech-card border border-tech-border text-[11px] font-bold text-tech-secondary hover:border-tech-cyan/50 transition-colors"
+                  title={t.select_language || "Select language"}
+                >
+                  <Globe size={13} className="text-tech-cyan" />
+                  <span className="hidden sm:inline">{currentLang?.localName || 'English'}</span>
+                </button>
+                {langMenuOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-60 max-h-72 overflow-y-auto bg-tech-card border border-tech-border rounded-xl shadow-2xl z-50 custom-scrollbar">
+                    {LANGUAGES.map((lang) => (
+                      <button
+                        key={lang.code}
+                        onClick={() => {
+                          onLanguageChange(lang.code);
+                          setLangMenuOpen(false);
+                        }}
+                        className={`w-full text-left px-3 py-2.5 text-xs hover:bg-tech-bg flex items-center justify-between gap-3 transition-colors ${
+                          language === lang.code ? 'text-tech-cyan' : 'text-tech-secondary'
+                        }`}
+                      >
+                        <span>{lang.name}</span>
+                        <span className="text-[10px] opacity-70">{lang.localName}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
             <button onClick={onEnterPortal} className="btn-secondary px-4 py-2 rounded-lg flex items-center gap-1.5">
               {t.landing_choose_portal || "Choose your portal"}
               <ArrowRight size={14} />
@@ -104,7 +155,11 @@ export const Landing: React.FC<LandingProps> = ({ t, onEnterPortal }) => {
 
         {/* Assistant panel */}
         <div id="ask" className="animate-fade-in">
-          <AgroAssistant t={t} languageCode="en" />
+          <AgroAssistant
+            t={t}
+            languageCode={language || 'en'}
+            onLanguageChange={onLanguageChange}
+          />
         </div>
       </section>
 

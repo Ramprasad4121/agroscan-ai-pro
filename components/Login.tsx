@@ -116,8 +116,8 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onBack, t }) => {
 
              {!role ? (
                <div className="animate-slide-up">
-                  <h2 className="text-2xl font-display font-bold text-tech-primary mb-2">Select Portal</h2>
-                  <p className="text-sm text-tech-secondary mb-6">Choose your role to access the dashboard.</p>
+                  <h2 className="text-2xl font-display font-bold text-tech-primary mb-2">{t.login_select_portal || "Select Portal"}</h2>
+                  <p className="text-sm text-tech-secondary mb-6">{t.login_choose_role || "Choose your role to access the dashboard."}</p>
                   
                   <div className="grid grid-cols-2 gap-3">
                      {roles.map(r => (
@@ -135,21 +135,21 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onBack, t }) => {
              ) : (
                <div className="animate-slide-up">
                   <button onClick={() => setRole(null)} className="flex items-center gap-2 text-tech-secondary hover:text-tech-primary mb-6 text-sm font-bold uppercase tracking-wider">
-                     <ArrowLeft size={16} /> Back
+                     <ArrowLeft size={16} /> {t.login_back || "Back"}
                   </button>
                   
                   <h2 className="text-2xl font-display font-bold text-tech-primary mb-1">
-                     {mode === 'login' ? 'Secure Access' : 'Register Node'}
+                     {mode === 'login' ? (t.secure_access || 'Secure Access') : (t.login_register_node || 'Register Node')}
                   </h2>
                   <p className="text-sm text-tech-secondary mb-6 uppercase tracking-widest text-tech-cyan font-bold">
-                     {roles.find(r => r.id === role)?.label} Portal
+                     {roles.find(r => r.id === role)?.label} {t.login_portal || 'Portal'}
                   </p>
 
                   <form onSubmit={handleSubmit} className="space-y-5">
                      {mode === 'signup' && (
                         <div className="grid grid-cols-1 gap-4 animate-fade-in">
                            <div className="bg-tech-bg p-3 rounded-lg border border-tech-border focus-within:border-tech-cyan transition-colors">
-                              <label className="block text-[10px] font-bold text-tech-secondary uppercase mb-1">Full Name</label>
+                              <label className="block text-[10px] font-bold text-tech-secondary uppercase mb-1">{t.full_name || "Full Name"}</label>
                               <div className="flex items-center gap-2 text-tech-primary">
                                  <UserIcon size={16} />
                                  <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} className="bg-transparent outline-none w-full text-sm font-bold" placeholder="e.g. Ram Kishan" />
@@ -157,15 +157,15 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onBack, t }) => {
                            </div>
                            {role === 'farmer' && (
                              <div className="grid grid-cols-2 gap-4">
-                                <input type="text" placeholder="Land (Acres)" className="bg-tech-bg p-3 rounded-lg border border-tech-border text-white text-sm" onChange={e => setLandSize(e.target.value)} />
-                                <input type="text" placeholder="Main Crop" className="bg-tech-bg p-3 rounded-lg border border-tech-border text-white text-sm" onChange={e => setMainCrop(e.target.value)} />
+                                <input type="text" placeholder={t.login_land_acres || "Land (Acres)"} className="bg-tech-bg p-3 rounded-lg border border-tech-border text-white text-sm" onChange={e => setLandSize(e.target.value)} />
+                                <input type="text" placeholder={t.main_crop || "Main Crop"} className="bg-tech-bg p-3 rounded-lg border border-tech-border text-white text-sm" onChange={e => setMainCrop(e.target.value)} />
                              </div>
                            )}
                         </div>
                      )}
 
                      <div className="bg-tech-bg p-3 rounded-lg border border-tech-border focus-within:border-tech-cyan transition-colors">
-                        <label className="block text-[10px] font-bold text-tech-secondary uppercase mb-1">User ID / Mobile</label>
+                        <label className="block text-[10px] font-bold text-tech-secondary uppercase mb-1">{t.login_user_id || "User ID / Mobile"}</label>
                         <div className="flex items-center gap-2 text-tech-primary">
                            <Phone size={16} />
                            <input type="text" value={identifier} onChange={e => setIdentifier(e.target.value)} className="bg-transparent outline-none w-full text-sm font-bold" placeholder="+91 98765 43210" />
@@ -173,7 +173,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onBack, t }) => {
                      </div>
 
                      <div className="bg-tech-bg p-3 rounded-lg border border-tech-border focus-within:border-tech-cyan transition-colors">
-                        <label className="block text-[10px] font-bold text-tech-secondary uppercase mb-1">Password</label>
+                        <label className="block text-[10px] font-bold text-tech-secondary uppercase mb-1">{t.login_password || "Password"}</label>
                         <div className="flex items-center gap-2 text-tech-primary">
                            <Lock size={16} />
                            <input type="password" value={password} onChange={e => setPassword(e.target.value)} className="bg-transparent outline-none w-full text-sm font-bold" placeholder="••••••" />
@@ -222,7 +222,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onBack, t }) => {
 
                      <div className="flex gap-4 mt-4">
                         <button type="submit" disabled={loading} className="flex-1 btn-primary py-3.5 rounded-lg flex items-center justify-center gap-2">
-                           {loading ? <div className="w-4 h-4 border-2 border-tech-bg border-t-transparent rounded-full animate-spin" /> : (mode === 'login' ? 'AUTHENTICATE' : 'INITIALIZE')}
+                           {loading ? <div className="w-4 h-4 border-2 border-tech-bg border-t-transparent rounded-full animate-spin" /> : (mode === 'login' ? (t.login_authenticate || 'AUTHENTICATE') : (t.login_initialize || 'INITIALIZE'))}
                            {!loading && <ArrowRight size={18} />}
                         </button>
                      </div>
@@ -235,7 +235,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onBack, t }) => {
 
                      <div className="text-center pt-4">
                         <button type="button" onClick={() => setMode(mode === 'login' ? 'signup' : 'login')} className="text-xs font-bold text-tech-secondary hover:text-tech-cyan uppercase tracking-wide">
-                           {mode === 'login' ? 'Create New Account' : 'Existing User Login'}
+                           {mode === 'login' ? (t.login_create_account || 'Create New Account') : (t.login_existing_user || 'Existing User Login')}
                         </button>
                      </div>
                   </form>

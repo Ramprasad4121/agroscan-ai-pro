@@ -57,7 +57,7 @@ export class ErrorBoundary extends React.Component<{ children: React.ReactNode }
             <RefreshCw size={16} /> Restart App
           </button>
           <div className="mt-5 flex items-center justify-center gap-2 text-tech-secondary/50 text-[10px] uppercase tracking-widest">
-            <Sprout size={12} /> AgroScan AI Pro
+            <Sprout size={12} /> Agro AI
           </div>
         </div>
       </div>

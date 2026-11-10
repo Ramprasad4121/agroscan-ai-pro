@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Send, Bot, User, Globe, ExternalLink, Volume2, StopCircle, Loader2 } from 'lucide-react';
 import { PlantDiagnosis, ChatMessage } from '../types';
 import { chatWithAgronomist, chatWithSearch, speakText } from '../services/gemini';
-import { playAudio } from '../utils';
+import { playAudio, stripMarkdown } from '../utils';
 import { LANGUAGES } from '../translations';
 import { VoiceInput, TextToSpeech } from './VoiceControls';
 
@@ -69,9 +69,10 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ diagnosisContext, 
         );
       }
 
-      setMessages(prev => [...prev, { 
-        role: 'model', 
-        text: responseText,
+      const cleanAnswer = stripMarkdown(responseText);
+      setMessages(prev => [...prev, {
+        role: 'model',
+        text: cleanAnswer || (t.error_generic || "Something went wrong. Try again."),
         groundingMetadata: groundingMetadata
       }]);
     } catch (err) {

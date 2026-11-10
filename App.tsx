@@ -32,12 +32,15 @@ import { AgriPassport } from './components/AgriPassport';
 import { Community } from './components/Community';
 import { WhatsAppBot } from './components/WhatsAppBot';
 import { DroneServices } from './components/DroneServices';
+import { Landing } from './components/Landing';
+import { TranslationStatus } from './components/TranslationStatus';
 import { PlantDiagnosis, User, ViewState } from './types';
-import { Leaf, Share2, MessageCircle, Loader2 } from 'lucide-react';
-import { LanguageCode } from './translations';
+import { Leaf, Share2, MessageCircle, Loader2, AlertTriangle } from 'lucide-react';
+import { LanguageCode, isSupportedLanguage, getLanguageName } from './translations';
 import { useTranslation } from './hooks/useTranslation';
+import { STORAGE_KEYS } from './utils';
 
-const SESSION_KEY = 'agroscan_user';
+const SESSION_KEY = STORAGE_KEYS.session;
 
 const readSession = (): User | null => {
   try {
@@ -57,8 +60,8 @@ const App: React.FC = () => {
     return readSession();
   });
   const [view, setView] = useState<ViewState>(() => {
-    if (typeof window === 'undefined') return 'login';
-    return readSession() ? 'home' : 'login';
+    if (typeof window === 'undefined') return 'landing';
+    return readSession() ? 'home' : 'landing';
   });
   const [currentImage, setCurrentImage] = useState<string | null>(null);
   const [diagnosis, setDiagnosis] = useState<PlantDiagnosis | null>(null);
@@ -66,18 +69,23 @@ const App: React.FC = () => {
   const [showWhatsApp, setShowWhatsApp] = useState(false);
   
   const [language, setLanguage] = useState<string | null>(() => {
-    const saved = localStorage.getItem('app_language');
+    const saved = localStorage.getItem(STORAGE_KEYS.language);
+    // Ignore a language we no longer support (e.g. from an older build)
+    if (saved && !isSupportedLanguage(saved)) {
+      localStorage.removeItem(STORAGE_KEYS.language);
+      return null;
+    }
     return saved || null;
   });
-  
+
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
   const [showTour, setShowTour] = useState(false);
 
-  const { t, isTranslating } = useTranslation(language);
+  const { t, isTranslating, error: translationError, retry: retryTranslation, targetLanguage } = useTranslation(language);
 
   const handleSetLanguage = (lang: string) => {
     setLanguage(lang);
-    localStorage.setItem('app_language', lang);
+    localStorage.setItem(STORAGE_KEYS.language, lang);
   };
 
   // Theme Management based on Role
@@ -117,7 +125,7 @@ const App: React.FC = () => {
     }
 
     if (userData.role === 'farmer') {
-      const hasSeenTour = localStorage.getItem('hasSeenTour');
+      const hasSeenTour = localStorage.getItem(STORAGE_KEYS.tourSeen);
       if (!hasSeenTour) {
         setTimeout(() => setShowTour(true), 1000);
       }
@@ -126,18 +134,18 @@ const App: React.FC = () => {
 
   const handleTourComplete = () => {
     setShowTour(false);
-    localStorage.setItem('hasSeenTour', 'true');
+    localStorage.setItem(STORAGE_KEYS.tourSeen, 'true');
   };
 
   const handleLogout = () => {
     setUser(null);
-    setView('login');
+    setView('landing');
     setDiagnosis(null);
     setCurrentImage(null);
     setLanguage(null);
     try {
       localStorage.removeItem(SESSION_KEY);
-      localStorage.removeItem('app_language');
+      localStorage.removeItem(STORAGE_KEYS.language);
     } catch {
       // ignore storage errors on logout
     }
@@ -160,13 +168,34 @@ const App: React.FC = () => {
   // --- LAYOUT & BACKGROUND ---
   // Using the "Tech Grid" pattern via CSS class `bg-tech-pattern`
   
+  if (view === 'landing') {
+    return (
+      <>
+        <Landing
+          t={t}
+          onEnterPortal={() => setView('login')}
+          language={language}
+          onLanguageChange={handleSetLanguage}
+          isTranslating={isTranslating}
+        />
+        <TranslationStatus
+          t={t}
+          isTranslating={isTranslating}
+          error={translationError}
+          targetLanguage={targetLanguage}
+          onRetry={retryTranslation}
+        />
+      </>
+    );
+  }
+
   if (view === 'login') {
     return (
       <div className="min-h-screen flex flex-col bg-tech-pattern text-tech-primary relative overflow-hidden">
          {/* Subtle decorative glow for tech feel */}
          <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-tech-cyan/5 to-transparent pointer-events-none"></div>
          <div className="relative z-10 w-full h-full flex flex-col">
-            <Login onLogin={handleLogin} t={t} />
+            <Login onLogin={handleLogin} onBack={() => setView('landing')} t={t} />
          </div>
       </div>
     );
@@ -286,16 +315,13 @@ const App: React.FC = () => {
           t={t}
         />
         
-        {isTranslating && (
-          <div className="fixed inset-0 z-50 bg-tech-bg/80 backdrop-blur-sm flex items-center justify-center">
-            <div className="tech-card p-6 rounded-lg flex items-center gap-4">
-               <Loader2 size={32} className="text-tech-cyan animate-spin" />
-               <div>
-                  <h3 className="font-bold text-tech-primary font-display">TRANSLATING SYSTEM...</h3>
-               </div>
-            </div>
-          </div>
-        )}
+        <TranslationStatus
+          t={t}
+          isTranslating={isTranslating}
+          error={translationError}
+          targetLanguage={targetLanguage}
+          onRetry={retryTranslation}
+        />
 
         <main className="flex-grow flex flex-col relative pt-4 md:pt-6">
           {renderRoleBasedInterface()}

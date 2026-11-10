@@ -426,4 +426,4 @@ export enum DiagnosisStatus {
   ERROR = 'ERROR'
 }
 
-export type ViewState = 'login' | 'home' | 'passport' | 'whatsapp' | 'community' | 'drones' | 'scan' | 'result' | 'visualize' | 'video' | 'audio' | 'market' | 'live' | 'schemes' | 'calendar' | 'recommend' | 'water' | 'yield' | 'fertilizer' | 'pesticide' | 'storage' | 'marketplace' | 'profit' | 'electricity';
+export type ViewState = 'landing' | 'login' | 'home' | 'passport' | 'whatsapp' | 'community' | 'drones' | 'scan' | 'result' | 'visualize' | 'video' | 'audio' | 'market' | 'live' | 'schemes' | 'calendar' | 'recommend' | 'water' | 'yield' | 'fertilizer' | 'pesticide' | 'storage' | 'marketplace' | 'profit' | 'electricity';

@@ -6,10 +6,11 @@ import { authService } from '../services/api';
 
 interface LoginProps {
   onLogin: (user: User) => void;
+  onBack?: () => void;
   t: any;
 }
 
-export const Login: React.FC<LoginProps> = ({ onLogin, t }) => {
+export const Login: React.FC<LoginProps> = ({ onLogin, onBack, t }) => {
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [role, setRole] = useState<UserRole | null>(null);
   const [loading, setLoading] = useState(false);
@@ -76,23 +77,25 @@ export const Login: React.FC<LoginProps> = ({ onLogin, t }) => {
              </div>
              <div>
                 <h1 className="text-6xl font-display font-bold text-tech-primary mb-4 tracking-tight">
-                   AGROSCAN <span className="text-tech-cyan">AI</span>
+                   AGRO <span className="text-tech-cyan">AI</span>
                 </h1>
                 <p className="text-xl text-tech-secondary max-w-md leading-relaxed font-light">
-                   Advanced Agricultural Intelligence Platform. 
-                   Connecting fields to the future.
+                   {t.landing_headline || "Everything a Farmer Needs. One Conversation Away."}
+                </p>
+                <p className="text-sm text-tech-secondary/80 max-w-md leading-relaxed mt-3">
+                   {t.landing_just_ask || "No navigating multiple websites. Just ask."}
                 </p>
              </div>
              <div className="grid grid-cols-2 gap-4 pt-8">
                 <div className="bg-tech-card p-4 rounded-lg border border-tech-border">
                    <Server className="text-tech-amber mb-2" />
-                   <h4 className="font-bold text-tech-primary text-sm uppercase">Real-time Data</h4>
-                   <p className="text-xs text-tech-secondary mt-1">Live mandi rates & satellite feeds</p>
+                   <h4 className="font-bold text-tech-primary text-sm uppercase">{t.landing_pillar_markets}</h4>
+                   <p className="text-xs text-tech-secondary mt-1">{t.landing_real_time_data || "Live mandi rates & satellite feeds"}</p>
                 </div>
                 <div className="bg-tech-card p-4 rounded-lg border border-tech-border">
                    <Shield className="text-tech-cyan mb-2" />
-                   <h4 className="font-bold text-tech-primary text-sm uppercase">Secure Identity</h4>
-                   <p className="text-xs text-tech-secondary mt-1">Blockchain-ready consent ledger</p>
+                   <h4 className="font-bold text-tech-primary text-sm uppercase">{t.landing_cta_portal}</h4>
+                   <p className="text-xs text-tech-secondary mt-1">{t.landing_secure_identity || "Blockchain-ready consent ledger"}</p>
                 </div>
              </div>
           </div>
@@ -101,11 +104,20 @@ export const Login: React.FC<LoginProps> = ({ onLogin, t }) => {
           <div className="bg-tech-card border border-tech-border rounded-2xl p-8 shadow-2xl relative overflow-hidden">
              {/* Top decorative line */}
              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-tech-cyan to-transparent"></div>
-             
+
+             {onBack && (
+               <button
+                  onClick={onBack}
+                  className="mb-5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-tech-secondary hover:text-tech-cyan transition-colors"
+               >
+                  <ArrowLeft size={12} /> {t.landing_back_home || "Agro AI home"}
+               </button>
+             )}
+
              {!role ? (
                <div className="animate-slide-up">
-                  <h2 className="text-2xl font-display font-bold text-tech-primary mb-2">Select Portal</h2>
-                  <p className="text-sm text-tech-secondary mb-6">Choose your role to access the dashboard.</p>
+                  <h2 className="text-2xl font-display font-bold text-tech-primary mb-2">{t.login_select_portal || "Select Portal"}</h2>
+                  <p className="text-sm text-tech-secondary mb-6">{t.login_choose_role || "Choose your role to access the dashboard."}</p>
                   
                   <div className="grid grid-cols-2 gap-3">
                      {roles.map(r => (
@@ -123,21 +135,21 @@ export const Login: React.FC<LoginProps> = ({ onLogin, t }) => {
              ) : (
                <div className="animate-slide-up">
                   <button onClick={() => setRole(null)} className="flex items-center gap-2 text-tech-secondary hover:text-tech-primary mb-6 text-sm font-bold uppercase tracking-wider">
-                     <ArrowLeft size={16} /> Back
+                     <ArrowLeft size={16} /> {t.login_back || "Back"}
                   </button>
                   
                   <h2 className="text-2xl font-display font-bold text-tech-primary mb-1">
-                     {mode === 'login' ? 'Secure Access' : 'Register Node'}
+                     {mode === 'login' ? (t.secure_access || 'Secure Access') : (t.login_register_node || 'Register Node')}
                   </h2>
                   <p className="text-sm text-tech-secondary mb-6 uppercase tracking-widest text-tech-cyan font-bold">
-                     {roles.find(r => r.id === role)?.label} Portal
+                     {roles.find(r => r.id === role)?.label} {t.login_portal || 'Portal'}
                   </p>
 
                   <form onSubmit={handleSubmit} className="space-y-5">
                      {mode === 'signup' && (
                         <div className="grid grid-cols-1 gap-4 animate-fade-in">
                            <div className="bg-tech-bg p-3 rounded-lg border border-tech-border focus-within:border-tech-cyan transition-colors">
-                              <label className="block text-[10px] font-bold text-tech-secondary uppercase mb-1">Full Name</label>
+                              <label className="block text-[10px] font-bold text-tech-secondary uppercase mb-1">{t.full_name || "Full Name"}</label>
                               <div className="flex items-center gap-2 text-tech-primary">
                                  <UserIcon size={16} />
                                  <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} className="bg-transparent outline-none w-full text-sm font-bold" placeholder="e.g. Ram Kishan" />
@@ -145,15 +157,15 @@ export const Login: React.FC<LoginProps> = ({ onLogin, t }) => {
                            </div>
                            {role === 'farmer' && (
                              <div className="grid grid-cols-2 gap-4">
-                                <input type="text" placeholder="Land (Acres)" className="bg-tech-bg p-3 rounded-lg border border-tech-border text-white text-sm" onChange={e => setLandSize(e.target.value)} />
-                                <input type="text" placeholder="Main Crop" className="bg-tech-bg p-3 rounded-lg border border-tech-border text-white text-sm" onChange={e => setMainCrop(e.target.value)} />
+                                <input type="text" placeholder={t.login_land_acres || "Land (Acres)"} className="bg-tech-bg p-3 rounded-lg border border-tech-border text-white text-sm" onChange={e => setLandSize(e.target.value)} />
+                                <input type="text" placeholder={t.main_crop || "Main Crop"} className="bg-tech-bg p-3 rounded-lg border border-tech-border text-white text-sm" onChange={e => setMainCrop(e.target.value)} />
                              </div>
                            )}
                         </div>
                      )}
 
                      <div className="bg-tech-bg p-3 rounded-lg border border-tech-border focus-within:border-tech-cyan transition-colors">
-                        <label className="block text-[10px] font-bold text-tech-secondary uppercase mb-1">User ID / Mobile</label>
+                        <label className="block text-[10px] font-bold text-tech-secondary uppercase mb-1">{t.login_user_id || "User ID / Mobile"}</label>
                         <div className="flex items-center gap-2 text-tech-primary">
                            <Phone size={16} />
                            <input type="text" value={identifier} onChange={e => setIdentifier(e.target.value)} className="bg-transparent outline-none w-full text-sm font-bold" placeholder="+91 98765 43210" />
@@ -161,7 +173,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, t }) => {
                      </div>
 
                      <div className="bg-tech-bg p-3 rounded-lg border border-tech-border focus-within:border-tech-cyan transition-colors">
-                        <label className="block text-[10px] font-bold text-tech-secondary uppercase mb-1">Password</label>
+                        <label className="block text-[10px] font-bold text-tech-secondary uppercase mb-1">{t.login_password || "Password"}</label>
                         <div className="flex items-center gap-2 text-tech-primary">
                            <Lock size={16} />
                            <input type="password" value={password} onChange={e => setPassword(e.target.value)} className="bg-transparent outline-none w-full text-sm font-bold" placeholder="••••••" />
@@ -210,7 +222,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, t }) => {
 
                      <div className="flex gap-4 mt-4">
                         <button type="submit" disabled={loading} className="flex-1 btn-primary py-3.5 rounded-lg flex items-center justify-center gap-2">
-                           {loading ? <div className="w-4 h-4 border-2 border-tech-bg border-t-transparent rounded-full animate-spin" /> : (mode === 'login' ? 'AUTHENTICATE' : 'INITIALIZE')}
+                           {loading ? <div className="w-4 h-4 border-2 border-tech-bg border-t-transparent rounded-full animate-spin" /> : (mode === 'login' ? (t.login_authenticate || 'AUTHENTICATE') : (t.login_initialize || 'INITIALIZE'))}
                            {!loading && <ArrowRight size={18} />}
                         </button>
                      </div>
@@ -223,7 +235,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, t }) => {
 
                      <div className="text-center pt-4">
                         <button type="button" onClick={() => setMode(mode === 'login' ? 'signup' : 'login')} className="text-xs font-bold text-tech-secondary hover:text-tech-cyan uppercase tracking-wide">
-                           {mode === 'login' ? 'Create New Account' : 'Existing User Login'}
+                           {mode === 'login' ? (t.login_create_account || 'Create New Account') : (t.login_existing_user || 'Existing User Login')}
                         </button>
                      </div>
                   </form>

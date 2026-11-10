@@ -1,6 +1,6 @@
 {
-  "name": "AgroScan AI Pro",
-  "description": "Advanced agricultural diagnostics powered by Gemini 2.5. Instant plant disease detection and expert agronomy advice.",
+  "name": "Agro AI",
+  "description": "Advanced agricultural diagnostics powered by Gemini. Instant plant disease detection and expert agronomy advice.",
   "requestFramePermissions": [
     "camera",
     "geolocation",

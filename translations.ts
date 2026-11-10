@@ -34,6 +34,27 @@ export const defaultTranslations = {
   // App General
   app_name: "AgroScan AI Pro",
   app_tagline: "The unified ecosystem connecting Farmers to Banks, Markets, and Government.",
+
+  // Dashboard chrome (previously hardcoded in Hero/Header/DashboardWidgets)
+  dashboard_label: "DASHBOARD",
+  view_passport: "VIEW PASSPORT",
+  system_active: "System Active",
+  diagnosis_label: "AI DIAGNOSIS",
+  scan_hero_title: "Scan Crop Health",
+  initiate_scan: "INITIATE",
+  assistant_card_title: "Assistant",
+  assistant_card_desc: "Talk to AI Expert",
+  tools_grid_title: "Operational Tools",
+  status_online: "Online",
+  status_offline: "Offline",
+  status_syncing: "Syncing",
+  status_pending: "Pending",
+  weather_live: "Live Weather",
+  weather_warning: "Warning",
+  weather_unavailable: "Data Unavailable",
+  weather_scanning: "Scanning satellites...",
+  market_pulse: "Market Pulse",
+  loading_market: "Loading Market Data...",
   
   // Language Selection
   select_language: "Select Language",

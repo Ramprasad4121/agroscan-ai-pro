@@ -21,7 +21,7 @@ export const WeatherWidget: React.FC<WidgetProps> = ({ userLocation, t }) => {
         setWeather(data.text);
         if (data.text.toLowerCase().includes('alert') || data.text.toLowerCase().includes('warning')) setIsAlert(true);
       } catch (e) {
-        setWeather("Data Unavailable");
+        setWeather(t.weather_unavailable || "Data Unavailable");
       }
     };
     fetchWeather();
@@ -32,11 +32,11 @@ export const WeatherWidget: React.FC<WidgetProps> = ({ userLocation, t }) => {
        <div className="relative z-10">
           <div className="flex items-center gap-2 mb-2">
              <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${isAlert ? 'bg-tech-amber text-tech-bg' : 'bg-tech-bg border border-tech-border text-tech-secondary'}`}>
-                {isAlert ? 'Warning' : 'Live Weather'}
+                {isAlert ? (t.weather_warning || 'Warning') : (t.weather_live || 'Live Weather')}
              </span>
           </div>
           <p className="text-lg font-bold text-tech-primary max-w-md leading-tight">
-             {weather || <span className="animate-pulse text-tech-secondary">Scanning satellites...</span>}
+             {weather || <span className="animate-pulse text-tech-secondary">{t.weather_scanning || "Scanning satellites..."}</span>}
           </p>
        </div>
        <div className="text-tech-cyan opacity-20">
@@ -63,13 +63,13 @@ export const MandiTicker: React.FC<WidgetProps> = ({ userLocation, t }) => {
     <div className="h-full w-full tech-card p-6 flex flex-col justify-center relative overflow-hidden">
        <div className="flex justify-between items-center mb-2">
           <span className="text-xs font-bold text-tech-secondary uppercase tracking-wider flex items-center gap-1">
-             <TrendingUp size={12} /> Market Pulse
+             <TrendingUp size={12} /> {t.market_pulse || "Market Pulse"}
           </span>
           <div className="w-1.5 h-1.5 bg-tech-cyan rounded-full animate-ping"></div>
        </div>
        <div className="text-lg font-bold text-tech-primary font-mono whitespace-nowrap overflow-hidden">
           <div className="animate-marquee inline-block">
-             {price || "Loading Market Data..."}
+             {price || (t.loading_market || "Loading Market Data...")}
           </div>
        </div>
        <div className="mt-2 h-1 w-full bg-tech-bg rounded-full overflow-hidden">

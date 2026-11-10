@@ -12,9 +12,10 @@ interface HeaderProps {
   currentView: ViewState;
   language: string;
   setLanguage: (lang: string) => void;
+  t: any;
 }
 
-export const Header: React.FC<HeaderProps> = ({ user, onNavigate, onLogout, currentView, language, setLanguage }) => {
+export const Header: React.FC<HeaderProps> = ({ user, onNavigate, onLogout, currentView, language, setLanguage, t }) => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [syncCount, setSyncCount] = useState(0);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -84,7 +85,7 @@ export const Header: React.FC<HeaderProps> = ({ user, onNavigate, onLogout, curr
            
            {/* Network Status (Hidden on Mobile for cleaner look matching screenshot) */}
            <div 
-              className={`hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all cursor-pointer text-xs font-bold tracking-wide ${
+              className={`hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all cursor-pointer text-xs font-bold uppercase tracking-wide ${
                 !isOnline 
                   ? 'bg-red-900/20 border-red-800 text-red-500' 
                   : syncCount > 0 
@@ -94,7 +95,7 @@ export const Header: React.FC<HeaderProps> = ({ user, onNavigate, onLogout, curr
               onClick={handleSync}
            >
               {!isOnline ? <WifiOff size={14} /> : isSyncing ? <RefreshCw size={14} className="animate-spin" /> : <Wifi size={14} className="text-tech-cyan" />}
-              <span>{isOnline ? (isSyncing ? 'SYNCING' : syncCount > 0 ? `${syncCount} PENDING` : 'ONLINE') : 'OFFLINE'}</span>
+              <span>{isOnline ? (isSyncing ? (t.status_syncing || 'SYNCING') : syncCount > 0 ? `${syncCount} ${t.status_pending || 'PENDING'}` : (t.status_online || 'ONLINE')) : (t.status_offline || 'OFFLINE')}</span>
            </div>
 
           {/* Language Globe */}
@@ -105,7 +106,7 @@ export const Header: React.FC<HeaderProps> = ({ user, onNavigate, onLogout, curr
             
             {/* Dropdown */}
             <div className="absolute right-0 top-full mt-2 w-64 bg-tech-card border border-tech-border rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 max-h-96 overflow-y-auto">
-               <div className="p-3 border-b border-tech-border text-xs font-bold text-tech-secondary uppercase">Select Language</div>
+               <div className="p-3 border-b border-tech-border text-xs font-bold text-tech-secondary uppercase">{t.select_language || 'Select Language'}</div>
                {LANGUAGES.map((lang) => (
                   <button
                     key={lang.code}

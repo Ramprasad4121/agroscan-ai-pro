@@ -253,6 +253,7 @@ const App: React.FC = () => {
           currentView={view}
           language={language as LanguageCode || 'en'}
           setLanguage={(code) => handleSetLanguage(code)}
+          t={t}
         />
         
         {isTranslating && (

@@ -51,8 +51,8 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, t, userLocation, userNam
              <div className="flex justify-between w-full items-start">
                 <div>
                     <h2 className="text-tech-cyan font-bold text-[10px] uppercase tracking-[0.2em] mb-1 flex items-center gap-2">
-                       DASHBOARD 
-                       <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[8px] text-tech-secondary bg-tech-bg px-1 rounded border border-tech-border">VIEW PASSPORT</span>
+                       {t.dashboard_label || "DASHBOARD"}
+                       <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[8px] text-tech-secondary bg-tech-bg px-1 rounded border border-tech-border">{t.view_passport || "VIEW PASSPORT"}</span>
                     </h2>
                     <h1 className="text-3xl font-display font-bold text-white mb-2">{userName || 'Ram Kishan'}</h1>
                     <p className="text-tech-secondary text-xs font-bold tracking-widest uppercase mb-1">{formattedDate}</p>
@@ -61,7 +61,7 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, t, userLocation, userNam
                 <div className="hidden sm:block">
                    <div className="flex items-center gap-2 bg-tech-bg/50 px-3 py-1 rounded-full border border-tech-border">
                       <span className="w-2 h-2 bg-tech-amber rounded-full animate-pulse shadow-[0_0_8px_#FFC107]"></span>
-                      <span className="text-tech-amber text-[10px] font-bold uppercase tracking-wider">System Active</span>
+                      <span className="text-tech-amber text-[10px] font-bold uppercase tracking-wider">{t.system_active || "System Active"}</span>
                    </div>
                 </div>
              </div>
@@ -69,7 +69,7 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, t, userLocation, userNam
              {/* Mobile Active Indicator */}
              <div className="sm:hidden mt-2 flex items-center gap-2">
                 <span className="w-2 h-2 bg-tech-amber rounded-full animate-pulse shadow-[0_0_8px_#FFC107]"></span>
-                <span className="text-tech-amber text-[10px] font-bold uppercase tracking-wider">System Active</span>
+                <span className="text-tech-amber text-[10px] font-bold uppercase tracking-wider">{t.system_active || "System Active"}</span>
              </div>
          </div>
       </div>
@@ -86,11 +86,11 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, t, userLocation, userNam
            <div className="relative z-10 w-full flex justify-between items-center">
               <div className="flex flex-col justify-between h-full gap-6">
                  <div>
-                    <span className="bg-tech-cyan/20 text-tech-cyan text-[10px] font-bold px-3 py-1 rounded border border-tech-cyan/30 uppercase tracking-wide">AI DIAGNOSIS</span>
-                    <h3 className="text-4xl font-display font-bold text-white mt-4 leading-none">SCAN CROP<br/>HEALTH</h3>
+                    <span className="bg-tech-cyan/20 text-tech-cyan text-[10px] font-bold px-3 py-1 rounded border border-tech-cyan/30 uppercase tracking-wide">{t.diagnosis_label || "AI DIAGNOSIS"}</span>
+                    <h3 className="text-4xl font-display font-bold text-white uppercase mt-4 leading-tight">{t.scan_hero_title || "SCAN CROP HEALTH"}</h3>
                  </div>
                  <div className="flex items-center gap-3 text-tech-cyan font-bold uppercase text-sm tracking-wider group-hover:translate-x-2 transition-transform">
-                    INITIATE <ArrowRight size={18} />
+                    {t.initiate_scan || "INITIATE"} <ArrowRight size={18} />
                  </div>
               </div>
               
@@ -112,8 +112,8 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, t, userLocation, userNam
                <Mic size={32} className="text-tech-amber" />
             </div>
             <div>
-                <h3 className="text-2xl font-bold text-white mb-1">Assistant</h3>
-                <p className="text-tech-secondary text-xs uppercase tracking-wider">Talk to AI Expert</p>
+                <h3 className="text-2xl font-bold text-white mb-1">{t.assistant_card_title || "Assistant"}</h3>
+                <p className="text-tech-secondary text-xs uppercase tracking-wider">{t.assistant_card_desc || "Talk to AI Expert"}</p>
             </div>
          </div>
       </div>
@@ -132,7 +132,7 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, t, userLocation, userNam
       <div className="mt-8 border-t border-tech-border pt-8">
          <h3 className="text-tech-secondary text-xs font-bold uppercase tracking-[0.2em] mb-6 flex items-center gap-4">
             <span className="h-px flex-1 bg-tech-border"></span>
-            Operational Tools
+            {t.tools_grid_title || "Operational Tools"}
             <span className="h-px flex-1 bg-tech-border"></span>
          </h3>
          
